@@ -1,3 +1,14 @@
 #!/usr/bin/env bash
 #
 # Rsync-based script for backups
+
+error() {
+  echo "ERROR: $1" >&2
+  exit 1
+}
+
+main() {
+  error "${FUNCNAME[0]}: ${LINENO[0]}: at least one option required"
+}
+
+main "$@"

@@ -18,3 +18,8 @@ setup() {
 @test "script file is executable" {
   assert_file_executable src/rsync_backup
 }
+
+@test "fail when run without command options" {
+  run rsync_backup
+  assert_failure
+}
