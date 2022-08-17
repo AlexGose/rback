@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+#
+# Rsync-based script for backups
