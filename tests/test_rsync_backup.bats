@@ -23,3 +23,11 @@ setup() {
   run rsync_backup
   assert_failure
 }
+
+@test "test usage function" {
+  source rsync_backup
+  run usage
+  assert_success
+  assert_output --partial "Usage:"
+  assert_output --partial "-h"
+}

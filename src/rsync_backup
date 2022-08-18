@@ -7,8 +7,18 @@ error() {
   exit 1
 }
 
+usage() {
+  local usage_string
+  usage_string="Usage: rsync_backup OPTIONS
+  OPTIONS
+  -h                     Display this help message"
+  echo "${usage_string}"
+}
+
 main() {
   error "${FUNCNAME[0]}: ${LINENO[0]}: at least one option required"
 }
 
-main "$@"
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  main "$@"
+fi
