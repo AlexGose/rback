@@ -16,7 +16,17 @@ usage() {
 }
 
 main() {
-  error "${FUNCNAME[0]}: ${LINENO[0]}: at least one option required"
+  if (( $# == 0 )); then
+    usage
+    error "${FUNCNAME[0]}: ${LINENO[0]}: at least one option required"
+  fi
+
+  while getopts :h opt; do
+    case "${opt}" in
+      h) usage; exit 0 ;;
+      *) : ;;
+    esac
+  done
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then

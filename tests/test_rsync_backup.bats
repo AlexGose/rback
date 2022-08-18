@@ -31,3 +31,10 @@ setup() {
   assert_output --partial "Usage:"
   assert_output --partial "-h"
 }
+
+@test "script prints usage with \"-h\" option" {
+  run rsync_backup -h
+  assert_success
+  assert_output --partial "Usage:"
+  assert_output --partial "-h"
+}
