@@ -3,7 +3,7 @@
 # Rsync-based script for backups
 
 error() {
-  echo "ERROR: $1" >&2
+  echo "ERROR: ${BASH_SOURCE[0]}: $1" >&2
   exit 1
 }
 
