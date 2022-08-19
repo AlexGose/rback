@@ -23,17 +23,19 @@ setup() {
   assert_failure
 }
 
-@test "test usage function" {
-  source rsync_backup
-  run usage
+check_usage_output() {
   assert_success
   assert_output --partial "Usage:"
   assert_output --partial "-h"
 }
 
+@test "test usage function" {
+  source rsync_backup
+  run usage
+  check_usage_output
+}
+
 @test "script prints usage with \"-h\" option" {
   run rsync_backup -h
-  assert_success
-  assert_output --partial "Usage:"
-  assert_output --partial "-h"
+  check_usage_output
 }
