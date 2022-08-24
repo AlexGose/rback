@@ -24,9 +24,10 @@ usage() {
 #         <interval> - integer interval of elapsed time, time between snapshots
 #         <limit> - integer limit of elapsed time, time limit of snapshots
 #
-# In the backup directory, a snapshot folder for <limit>+<interval> elapsed
-# time will be created temporarily.  Other folders and files in the backup
-# directory will potentially be modified or deleted.
+# In the backup directory, a snapshot folder for <limit> + <interval> elapsed
+# time will be created temporarily if it does not already exist; otherwise,
+# an error will occur.  Other folders and files in the backup directory will
+# potentially be modified or deleted.
 rotate_snapshots() {
   local backup_dir
   backup_dir=$1
@@ -36,6 +37,12 @@ rotate_snapshots() {
   interval=$3
   local limit
   limit=$4
+  if [[ -d "${backup_dir}/${time_unit}.$(( limit + interval ))" ]]; then
+    local error_prefix
+    error_prefix="${FUNCNAME[0]}: ${LINENO[0]}: ${backup_dir}/"
+    error "${error_prefix}${time_unit}.$(( limit + interval )) already exists"
+  fi
+
   for (( n = limit; n >= interval; n -= interval )); do
     if [[ -d "${backup_dir}/${time_unit}.${n}" ]]; then
       mv -- "${backup_dir}/${time_unit}.${n}" \

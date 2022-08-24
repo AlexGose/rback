@@ -10,6 +10,12 @@ setup() {
   PATH="${BATS_TEST_DIRNAME}/../src:${PATH}"
   
   TEMP_TEST_DIR="$(mktemp -d /tmp/rsync_backup_test_XXXXX)"
+
+  work_dir="${PWD}"
+  cd "${TEMP_TEST_DIR}"
+  mkdir hour.{2,4,6}
+  touch hour.2/a hour.4/b hour.6/c
+  cd "${work_dir}"
 }
 
 teardown() {
@@ -49,15 +55,17 @@ check_usage_output() {
 @test "rotate_snapshots function rotates 3 snapshot folders" {
   source rsync_backup
 
-  work_dir="${PWD}"
-  cd "${TEMP_TEST_DIR}"
-  mkdir hour.{2,4,6}
-  touch hour.2/a hour.4/b hour.6/c
-  cd "${work_dir}"
-
   run rotate_snapshots "${TEMP_TEST_DIR}" hour 2 6
   assert_success
   assert_file_exists "${TEMP_TEST_DIR}/hour.2/c"
   assert_file_exists "${TEMP_TEST_DIR}/hour.4/a"
   assert_file_exists "${TEMP_TEST_DIR}/hour.6/b"
+}
+
+@test "rotate_snapshots function fails if limit + interval folder exists" {
+  source rsync_backup
+
+  run rotate_snapshots "${TEMP_TEST_DIR}" hour 2 4
+  assert_failure
+  assert_output --partial "${TEMP_TEST_DIR}/hour.6 already exists"
 }
