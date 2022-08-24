@@ -55,9 +55,8 @@ check_usage_output() {
   touch hour.2/a hour.4/b hour.6/c
   cd "${work_dir}"
 
-  #run rotate_snapshots "${TEMP_TEST_DIR}" hour 2 6
-  #assert_success
-  rotate_snapshots "${TEMP_TEST_DIR}" hour 2 6 >&3
+  run rotate_snapshots "${TEMP_TEST_DIR}" hour 2 6
+  assert_success
   assert_file_exists "${TEMP_TEST_DIR}/hour.2/c"
   assert_file_exists "${TEMP_TEST_DIR}/hour.4/a"
   assert_file_exists "${TEMP_TEST_DIR}/hour.6/b"
