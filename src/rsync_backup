@@ -17,6 +17,15 @@ usage() {
 
 # Rotate snapshot folders by a given interval of elapsed time
 #
+# If snapshot folders corresponding to
+#   <interval>, 2 <interval>, 3 <interval>, ..., <limit>
+# <time unit>s already exist, then this function rotates each to the next
+# highest interval.  The last folder will be rotated to the first folder.
+#
+# If there is not a snapshot corresponding to <limit> <time unit>s, then
+# an empty snapshot folder corresponding to <interval> <time unit>s will be
+# created.
+#
 # Usage: rotate_snapshots <backup dir> <time unit> <interval> <limit>
 #
 # Inputs: <backup dir> - path to the directory containing all snapshot folders
@@ -49,8 +58,12 @@ rotate_snapshots() {
           "${backup_dir}/${time_unit}.$(( n + interval ))"
     fi
   done
-  mv -- "${backup_dir}/${time_unit}.$(( limit + interval ))" \
+  if [[ -d "${backup_dir}/${time_unit}.$(( limit + interval ))" ]]; then
+    mv -- "${backup_dir}/${time_unit}.$(( limit + interval ))" \
       "${backup_dir}/${time_unit}.${interval}"
+  else
+    mkdir "${backup_dir}/${time_unit}.${interval}"
+  fi
 }
 
 main() {

@@ -69,3 +69,17 @@ check_usage_output() {
   assert_failure
   assert_output --partial "${TEMP_TEST_DIR}/hour.6 already exists"
 }
+
+@test "rotate_snapshots creates empty first folder if no last folder" {
+  source rsync_backup
+
+  run rotate_snapshots "${TEMP_TEST_DIR}" hour 2 10
+  assert_success
+  assert_dir_exists "${TEMP_TEST_DIR}/hour.2"
+  [ "$(ls ${TEMP_TEST_DIR}/hour.2)" == "" ]
+}
+
+@test "rotate_snapshots succeeds with no existing snapshot folders" {
+  source rsync_backup
+  run rotate_snapshots "${TEMP_TEST_DIR}" hour 8 16
+}
