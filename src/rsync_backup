@@ -15,6 +15,37 @@ usage() {
   echo "${usage_string}"
 }
 
+# Rotate snapshot folders by a given interval of elapsed time
+#
+# Usage: rotate_snapshots <backup dir> <time unit> <interval> <limit>
+#
+# Inputs: <backup dir> - path to the directory containing all snapshot folders
+#         <time unit> - unit of time ("minute","hour","day",etc.)
+#         <interval> - integer interval of elapsed time, time between snapshots
+#         <limit> - integer limit of elapsed time, time limit of snapshots
+#
+# In the backup directory, a snapshot folder for <limit>+<interval> elapsed
+# time will be created temporarily.  Other folders and files in the backup
+# directory will potentially be modified or deleted.
+rotate_snapshots() {
+  local backup_dir
+  backup_dir=$1
+  local time_unit
+  time_unit=$2
+  local interval
+  interval=$3
+  local limit
+  limit=$4
+  for (( n = limit; n >= interval; n -= interval )); do
+    if [[ -d "${backup_dir}/${time_unit}.${n}" ]]; then
+      mv -- "${backup_dir}/${time_unit}.${n}" \
+          "${backup_dir}/${time_unit}.$(( n + interval ))"
+    fi
+  done
+  mv -- "${backup_dir}/${time_unit}.$(( limit + interval ))" \
+      "${backup_dir}/${time_unit}.${interval}"
+}
+
 main() {
   if (( $# == 0 )); then
     usage

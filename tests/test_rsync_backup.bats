@@ -8,6 +8,12 @@ setup() {
   load 'test_helper/bats-assert/load'
   
   PATH="${BATS_TEST_DIRNAME}/../src:${PATH}"
+  
+  TEMP_TEST_DIR="$(mktemp -d /tmp/rsync_backup_test_XXXXX)"
+}
+
+teardown() {
+  rm -rf "${TEMP_TEST_DIR}"
 }
 
 @test "script file exists" {
@@ -38,4 +44,21 @@ check_usage_output() {
 @test "script prints usage with \"-h\" option" {
   run rsync_backup -h
   check_usage_output
+}
+
+@test "rotate_snapshots function rotates 3 snapshot folders" {
+  source rsync_backup
+
+  work_dir="${PWD}"
+  cd "${TEMP_TEST_DIR}"
+  mkdir hour.{2,4,6}
+  touch hour.2/a hour.4/b hour.6/c
+  cd "${work_dir}"
+
+  #run rotate_snapshots "${TEMP_TEST_DIR}" hour 2 6
+  #assert_success
+  rotate_snapshots "${TEMP_TEST_DIR}" hour 2 6 >&3
+  assert_file_exists "${TEMP_TEST_DIR}/hour.2/c"
+  assert_file_exists "${TEMP_TEST_DIR}/hour.4/a"
+  assert_file_exists "${TEMP_TEST_DIR}/hour.6/b"
 }
