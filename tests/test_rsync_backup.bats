@@ -79,7 +79,9 @@ check_usage_output() {
   [ "$(ls ${TEMP_TEST_DIR}/hour.2)" == "" ]
 }
 
-@test "rotate_snapshots succeeds with no existing snapshot folders" {
+@test "rotate_snapshots creates empty folder if no snapshot folders exist" {
   source rsync_backup
   run rotate_snapshots "${TEMP_TEST_DIR}" hour 8 16
+  assert_dir_exists "${TEMP_TEST_DIR}/hour.8"
+  [ "$(ls ${TEMP_TEST_DIR}/hour.8)" == "" ]
 }
