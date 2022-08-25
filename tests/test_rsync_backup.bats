@@ -55,7 +55,7 @@ check_usage_output() {
 @test "rotate_snapshots function rotates 3 snapshot folders" {
   source rsync_backup
 
-  run rotate_snapshots "${TEMP_TEST_DIR}" hour 2 6
+  run rotate_snapshots "${TEMP_TEST_DIR}" hour 2 2 6
   assert_success
   assert_file_exists "${TEMP_TEST_DIR}/hour.2/c"
   assert_file_exists "${TEMP_TEST_DIR}/hour.4/a"
@@ -65,7 +65,7 @@ check_usage_output() {
 @test "rotate_snapshots function fails if limit + interval folder exists" {
   source rsync_backup
 
-  run rotate_snapshots "${TEMP_TEST_DIR}" hour 2 4
+  run rotate_snapshots "${TEMP_TEST_DIR}" hour 2 2 4
   assert_failure
   assert_output --partial "${TEMP_TEST_DIR}/hour.6 already exists"
 }
@@ -73,7 +73,7 @@ check_usage_output() {
 @test "rotate_snapshots creates empty first folder if no last folder" {
   source rsync_backup
 
-  run rotate_snapshots "${TEMP_TEST_DIR}" hour 2 10
+  run rotate_snapshots "${TEMP_TEST_DIR}" hour 2 2 10
   assert_success
   assert_dir_exists "${TEMP_TEST_DIR}/hour.2"
   [ "$(ls ${TEMP_TEST_DIR}/hour.2)" == "" ]
@@ -81,7 +81,19 @@ check_usage_output() {
 
 @test "rotate_snapshots creates empty folder if no snapshot folders exist" {
   source rsync_backup
-  run rotate_snapshots "${TEMP_TEST_DIR}" hour 8 16
+  run rotate_snapshots "${TEMP_TEST_DIR}" hour 8 8 16
   assert_dir_exists "${TEMP_TEST_DIR}/hour.8"
   [ "$(ls ${TEMP_TEST_DIR}/hour.8)" == "" ]
+}
+
+@test "rotate_snapshots with start different from interval" {
+  source rsync_backup
+  mkdir "${TEMP_TEST_DIR}/hour.0"
+  touch "${TEMP_TEST_DIR}/hour.0/d"
+  run rotate_snapshots "${TEMP_TEST_DIR}" hour 0 2 6
+  assert_success
+  assert_file_exists "${TEMP_TEST_DIR}/hour.0/c"
+  assert_file_exists "${TEMP_TEST_DIR}/hour.2/d"
+  assert_file_exists "${TEMP_TEST_DIR}/hour.4/a"
+  assert_file_exists "${TEMP_TEST_DIR}/hour.6/b"
 }

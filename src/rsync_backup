@@ -18,18 +18,20 @@ usage() {
 # Rotate snapshot folders by a given interval of elapsed time
 #
 # If snapshot folders corresponding to
-#   <interval>, 2 <interval>, 3 <interval>, ..., <limit>
+#   <start>, <start> + <interval>, <start> + 2 <interval>, ..., <limit>
 # <time unit>s already exist, then this function rotates each to the next
-# highest interval.  The last folder will be rotated to the first folder.
+# highest interval.  The last folder will be rotated to the first folder, 
+# corresponding to <start> <time unit>s.
 #
 # If there is not a snapshot corresponding to <limit> <time unit>s, then
-# an empty snapshot folder corresponding to <interval> <time unit>s will be
+# an empty snapshot folder corresponding to <start> <time unit>s will be
 # created.
 #
-# Usage: rotate_snapshots <backup dir> <time unit> <interval> <limit>
+# Usage: rotate_snapshots <backup dir> <time unit> <start> <interval> <limit>
 #
 # Inputs: <backup dir> - path to the directory containing all snapshot folders
 #         <time unit> - unit of time ("minute","hour","day",etc.)
+#         <start> - integer elapsed start time, time of the first snapshot
 #         <interval> - integer interval of elapsed time, time between snapshots
 #         <limit> - integer limit of elapsed time, time limit of snapshots
 #
@@ -42,27 +44,31 @@ rotate_snapshots() {
   backup_dir=$1
   local time_unit
   time_unit=$2
+  local start
+  start=$3
   local interval
-  interval=$3
+  interval=$4
   local limit
-  limit=$4
+  limit=$5
   if [[ -d "${backup_dir}/${time_unit}.$(( limit + interval ))" ]]; then
     local error_prefix
     error_prefix="${FUNCNAME[0]}: ${LINENO[0]}: ${backup_dir}/"
     error "${error_prefix}${time_unit}.$(( limit + interval )) already exists"
   fi
 
-  for (( n = limit; n >= interval; n -= interval )); do
+  for (( n = limit; n >= start; n -= interval )); do
     if [[ -d "${backup_dir}/${time_unit}.${n}" ]]; then
       mv -- "${backup_dir}/${time_unit}.${n}" \
           "${backup_dir}/${time_unit}.$(( n + interval ))"
     fi
   done
+
   if [[ -d "${backup_dir}/${time_unit}.$(( limit + interval ))" ]]; then
+    # move last snapshot folder to the start
     mv -- "${backup_dir}/${time_unit}.$(( limit + interval ))" \
-      "${backup_dir}/${time_unit}.${interval}"
-  else
-    mkdir "${backup_dir}/${time_unit}.${interval}"
+      "${backup_dir}/${time_unit}.${start}"
+  else # no last snapshot folder exists
+    mkdir "${backup_dir}/${time_unit}.${start}"
   fi
 }
 
