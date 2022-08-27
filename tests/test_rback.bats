@@ -13,8 +13,8 @@ setup() {
 
   work_dir="${PWD}"
   cd "${TEMP_TEST_DIR}"
-  mkdir hour.{2,4,6}
-  touch hour.2/a hour.4/b hour.6/c
+  mkdir hour.{2,4,6}.2
+  touch hour.2.2/a hour.4.2/b hour.6.2/c
   cd "${work_dir}"
 
   source rback
@@ -56,39 +56,39 @@ check_usage_output() {
 @test "rotate_snapshots function rotates 3 snapshot folders" {
   run rotate_snapshots "${TEMP_TEST_DIR}" hour 2 2 6
   assert_success
-  assert_file_exists "${TEMP_TEST_DIR}/hour.2/c"
-  assert_file_exists "${TEMP_TEST_DIR}/hour.4/a"
-  assert_file_exists "${TEMP_TEST_DIR}/hour.6/b"
+  assert_file_exists "${TEMP_TEST_DIR}/hour.2.2/c"
+  assert_file_exists "${TEMP_TEST_DIR}/hour.4.2/a"
+  assert_file_exists "${TEMP_TEST_DIR}/hour.6.2/b"
 }
 
 @test "rotate_snapshots function fails if limit + interval folder exists" {
   run rotate_snapshots "${TEMP_TEST_DIR}" hour 2 2 4
   assert_failure
-  assert_output --partial "${TEMP_TEST_DIR}/hour.6 already exists"
+  assert_output --partial "${TEMP_TEST_DIR}/hour.6.2 already exists"
 }
 
 @test "rotate_snapshots creates empty first folder if no last folder" {
   run rotate_snapshots "${TEMP_TEST_DIR}" hour 2 2 10
   assert_success
-  assert_dir_exists "${TEMP_TEST_DIR}/hour.2"
-  [ "$(ls ${TEMP_TEST_DIR}/hour.2)" == "" ]
+  assert_dir_exists "${TEMP_TEST_DIR}/hour.2.2"
+  [ "$(ls ${TEMP_TEST_DIR}/hour.2.2)" == "" ]
 }
 
 @test "rotate_snapshots creates empty folder if no snapshot folders exist" {
   run rotate_snapshots "${TEMP_TEST_DIR}" hour 8 8 16
-  assert_dir_exists "${TEMP_TEST_DIR}/hour.8"
-  [ "$(ls ${TEMP_TEST_DIR}/hour.8)" == "" ]
+  assert_dir_exists "${TEMP_TEST_DIR}/hour.8.8"
+  [ "$(ls ${TEMP_TEST_DIR}/hour.8.8)" == "" ]
 }
 
 @test "rotate_snapshots with start different from interval" {
-  mkdir "${TEMP_TEST_DIR}/hour.0"
-  touch "${TEMP_TEST_DIR}/hour.0/d"
+  mkdir "${TEMP_TEST_DIR}/hour.0.2"
+  touch "${TEMP_TEST_DIR}/hour.0.2/d"
   run rotate_snapshots "${TEMP_TEST_DIR}" hour 0 2 6
   assert_success
-  assert_file_exists "${TEMP_TEST_DIR}/hour.0/c"
-  assert_file_exists "${TEMP_TEST_DIR}/hour.2/d"
-  assert_file_exists "${TEMP_TEST_DIR}/hour.4/a"
-  assert_file_exists "${TEMP_TEST_DIR}/hour.6/b"
+  assert_file_exists "${TEMP_TEST_DIR}/hour.0.2/c"
+  assert_file_exists "${TEMP_TEST_DIR}/hour.2.2/d"
+  assert_file_exists "${TEMP_TEST_DIR}/hour.4.2/a"
+  assert_file_exists "${TEMP_TEST_DIR}/hour.6.2/b"
 }
 
 @test "README file usage information matches help from script" {

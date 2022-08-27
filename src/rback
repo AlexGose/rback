@@ -50,25 +50,27 @@ rotate_snapshots() {
   interval=$4
   local limit
   limit=$5
-  if [[ -d "${backup_dir}/${time_unit}.$(( limit + interval ))" ]]; then
-    local error_prefix
-    error_prefix="${FUNCNAME[0]}: ${LINENO[0]}: ${backup_dir}/"
-    error "${error_prefix}${time_unit}.$(( limit + interval )) already exists"
+
+  local temp_folder # temporary snapshot folder name
+  temp_folder="${backup_dir}/${time_unit}.$(( limit + interval ))"
+  temp_folder+=".$(( interval ))"
+
+  if [[ -d "${temp_folder}" ]]; then
+    error "${FUNCNAME[0]}: ${LINENO[0]}: ${temp_folder} already exists"
   fi
 
   for (( n = limit; n >= start; n -= interval )); do
-    if [[ -d "${backup_dir}/${time_unit}.${n}" ]]; then
-      mv -- "${backup_dir}/${time_unit}.${n}" \
-          "${backup_dir}/${time_unit}.$(( n + interval ))"
+    if [[ -d "${backup_dir}/${time_unit}.${n}.$(( interval ))" ]]; then
+      mv -- "${backup_dir}/${time_unit}.${n}.$(( interval ))" \
+          "${backup_dir}/${time_unit}.$(( n + interval )).$(( interval ))"
     fi
   done
 
-  if [[ -d "${backup_dir}/${time_unit}.$(( limit + interval ))" ]]; then
-    # move last snapshot folder to the start
-    mv -- "${backup_dir}/${time_unit}.$(( limit + interval ))" \
-      "${backup_dir}/${time_unit}.${start}"
+  if [[ -d "${temp_folder}" ]]; then # move temp snapshot folder to the start
+    mv -- "${backup_dir}/${time_unit}.$(( limit + interval )).$(( interval ))" \
+        "${backup_dir}/${time_unit}.${start}.$(( interval ))"
   else # no last snapshot folder exists
-    mkdir "${backup_dir}/${time_unit}.${start}"
+    mkdir "${backup_dir}/${time_unit}.${start}.$(( interval ))"
   fi
 }
 
