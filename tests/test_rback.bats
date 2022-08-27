@@ -90,3 +90,8 @@ check_usage_output() {
   assert_file_exists "${TEMP_TEST_DIR}/hour.4/a"
   assert_file_exists "${TEMP_TEST_DIR}/hour.6/b"
 }
+
+@test "README file usage information matches help from script" {
+  run cat README.md
+  assert_output --partial "$(src/rback -h)"
+}
