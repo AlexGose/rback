@@ -9,7 +9,7 @@ setup() {
   
   PATH="${BATS_TEST_DIRNAME}/../src:${PATH}"
   
-  TEMP_TEST_DIR="$(mktemp -d /tmp/rsync_backup_test_XXXXX)"
+  TEMP_TEST_DIR="$(mktemp -d /tmp/rback_test_XXXXX)"
 
   work_dir="${PWD}"
   cd "${TEMP_TEST_DIR}"
@@ -17,7 +17,7 @@ setup() {
   touch hour.2/a hour.4/b hour.6/c
   cd "${work_dir}"
 
-  source rsync_backup
+  source rback
 }
 
 teardown() {
@@ -25,15 +25,15 @@ teardown() {
 }
 
 @test "script file exists" {
-  assert_file_exists src/rsync_backup
+  assert_file_exists src/rback
 }
 
 @test "script file is executable" {
-  assert_file_executable src/rsync_backup
+  assert_file_executable src/rback
 }
 
 @test "script fails without command options" {
-  run rsync_backup
+  run rback
   assert_failure
 }
 
@@ -49,7 +49,7 @@ check_usage_output() {
 }
 
 @test "script prints usage with \"-h\" option" {
-  run rsync_backup -h
+  run rback -h
   check_usage_output
 }
 

@@ -9,7 +9,7 @@ error() {
 
 usage() {
   local usage_string
-  usage_string="Usage: rsync_backup OPTIONS
+  usage_string="Usage: rback OPTIONS
   OPTIONS
   -h                     Display this help message"
   echo "${usage_string}"
