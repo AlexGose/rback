@@ -53,6 +53,11 @@ check_usage_output() {
   check_usage_output
 }
 
+@test "script prints usage with \"--help\" option" {
+  run rback --help
+  check_usage_output
+}
+
 @test "rotate function rotates 3 snapshot folders" {
   run rotate "${TEMP_TEST_DIR}" hour 2 2 6
   assert_success
