@@ -125,6 +125,7 @@ main() {
   while :; do
     case "$1" in
       -h|--help) usage; exit 0 ;; 
+      -*) error "${FUNCNAME[0]}: ${LINENO[0]}: Unknown option \"$1\"" ;;
       *) break ;;
     esac
     shift

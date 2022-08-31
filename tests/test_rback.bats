@@ -100,3 +100,9 @@ check_usage_output() {
   run cat README.md
   assert_output --partial "$(src/rback -h)"
 }
+
+@test "script fails with unknown option \"-z\"" {
+  run rback -z
+  assert_failure
+  assert_output --partial "Unknown option \"-z\""
+}
