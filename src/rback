@@ -27,7 +27,7 @@ usage() {
 # an empty snapshot folder corresponding to <start> <time unit>s will be
 # created.
 #
-# Usage: rotate_snapshots <backup dir> <time unit> <start> <interval> <limit>
+# Usage: rotate <backup dir> <time unit> <start> <interval> <limit>
 #
 # Inputs: <backup dir> - path to the directory containing all snapshot folders
 #         <time unit> - unit of time ("minute","hour","day",etc.)
@@ -39,7 +39,7 @@ usage() {
 # time will be created temporarily if it does not already exist; otherwise,
 # an error will occur.  Snapshot folders in the backup directory will
 # potentially be renamed.
-rotate_snapshots() {
+rotate() {
   local backup_dir
   backup_dir=$1
   local time_unit

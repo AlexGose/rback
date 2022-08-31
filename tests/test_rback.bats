@@ -53,37 +53,37 @@ check_usage_output() {
   check_usage_output
 }
 
-@test "rotate_snapshots function rotates 3 snapshot folders" {
-  run rotate_snapshots "${TEMP_TEST_DIR}" hour 2 2 6
+@test "rotate function rotates 3 snapshot folders" {
+  run rotate "${TEMP_TEST_DIR}" hour 2 2 6
   assert_success
   assert_file_exists "${TEMP_TEST_DIR}/hour.2.2/c"
   assert_file_exists "${TEMP_TEST_DIR}/hour.4.2/a"
   assert_file_exists "${TEMP_TEST_DIR}/hour.6.2/b"
 }
 
-@test "rotate_snapshots function fails if limit + interval folder exists" {
-  run rotate_snapshots "${TEMP_TEST_DIR}" hour 2 2 4
+@test "rotate function fails if limit + interval folder exists" {
+  run rotate "${TEMP_TEST_DIR}" hour 2 2 4
   assert_failure
   assert_output --partial "${TEMP_TEST_DIR}/hour.6.2 already exists"
 }
 
-@test "rotate_snapshots creates empty first folder if no last folder" {
-  run rotate_snapshots "${TEMP_TEST_DIR}" hour 2 2 10
+@test "rotate creates empty first folder if no last folder" {
+  run rotate "${TEMP_TEST_DIR}" hour 2 2 10
   assert_success
   assert_dir_exists "${TEMP_TEST_DIR}/hour.2.2"
   [ "$(ls ${TEMP_TEST_DIR}/hour.2.2)" == "" ]
 }
 
-@test "rotate_snapshots creates empty folder if no snapshot folders exist" {
-  run rotate_snapshots "${TEMP_TEST_DIR}" hour 8 8 16
+@test "rotate function creates empty folder if no snapshot folders exist" {
+  run rotate "${TEMP_TEST_DIR}" hour 8 8 16
   assert_dir_exists "${TEMP_TEST_DIR}/hour.8.8"
   [ "$(ls ${TEMP_TEST_DIR}/hour.8.8)" == "" ]
 }
 
-@test "rotate_snapshots with start different from interval" {
+@test "rotate function with start different from interval" {
   mkdir "${TEMP_TEST_DIR}/hour.0.2"
   touch "${TEMP_TEST_DIR}/hour.0.2/d"
-  run rotate_snapshots "${TEMP_TEST_DIR}" hour 0 2 6
+  run rotate "${TEMP_TEST_DIR}" hour 0 2 6
   assert_success
   assert_file_exists "${TEMP_TEST_DIR}/hour.0.2/c"
   assert_file_exists "${TEMP_TEST_DIR}/hour.2.2/d"
