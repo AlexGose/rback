@@ -60,52 +60,52 @@ rotate() {
   fi
 
   for (( n = limit; n >= start; n -= interval )); do
-    shift_snapshot "${backup_dir}" "${time_unit}" $n "${interval}"
+    update "${backup_dir}" "${time_unit}" $n "${interval}"
   done
-  shift_snapshot "${backup_dir}" "${time_unit}" "$(( limit + interval ))" \
+  update "${backup_dir}" "${time_unit}" "$(( limit + interval ))" \
         "${interval}" "${start}"
 }
 
-# Shift a snapshot folder to the next interval of, or given, elapsed time
+# Update a snapshot folder to the next interval of, or given, elapsed time
 #
-# Usage: shift_snapshot <backup dir> <time unit> <time before> <interval> \
+# Usage: update <backup dir> <time unit> <time before> <interval> \
 #                [<time after>]
 #
 # Inputs: 
 #    <backup dir> - path to the directory containing all the snapshot folders
 #    <time unit> - unit of time ("minute","hour","day",etc.)
-#    <time before> - integer elapsed time for the snapshot before being shifted
+#    <time before> - integer elapsed time for the snapshot before update
 #    <interval> - integer interval of elapsed time, for the snapshot before
-#                 being shifted
+#                 update
 #    <time after> - (optional) integer elapsed time, for the snapshot after
-#                 being shifted.  An empty argument implies that the snapshot
+#                 update.  An empty argument implies that the snapshot
 #                 will have a total elapsed time of <time before> + <interval>
-#                 after being shifted
+#                 after update 
 #
 #  This function changes the name of the snapshot folder corresponding to the
 #  input arguments, if such a snapshot exits.  Otherwise, in the case of 4 
 #  input arguments, nothing will be done.  In the case of 5 input arguments,
 #  the function will create an empty snapshot folder corresponding to the
-#  elapsed time after the shift.  An error will occur if the
+#  elapsed time after the update.  An error will occur if the
 #  number of arguments to this function is incorrect.
-shift_snapshot() {
+update() {
   local snapshot_prefix
   snapshot_prefix="$1/$2."
   local elapsed_time
   elapsed_time=$3
   local interval
   interval=$4
-  local snapshot_to_shift
-  snapshot_to_shift=${snapshot_prefix}$(( elapsed_time )).$(( interval ))
+  local snapshot_to_update
+  snapshot_to_update=${snapshot_prefix}$(( elapsed_time )).$(( interval ))
 
   if (( $# == 4 )); then
-    if [[ -d "${snapshot_to_shift}" ]]; then
-      mv -- "${snapshot_to_shift}" \
+    if [[ -d "${snapshot_to_update}" ]]; then
+      mv -- "${snapshot_to_update}" \
           "${snapshot_prefix}$(( elapsed_time + interval )).$(( interval ))"
     fi
   elif (( $# == 5 )); then
-    if [[ -d "${snapshot_to_shift}" ]]; then
-      mv -- "${snapshot_to_shift}" "${snapshot_prefix}$5.$(( interval ))"
+    if [[ -d "${snapshot_to_update}" ]]; then
+      mv -- "${snapshot_to_update}" "${snapshot_prefix}$5.$(( interval ))"
     else
       mkdir "${snapshot_prefix}$5.$(( interval ))"
     fi
