@@ -106,3 +106,15 @@ check_usage_output() {
   assert_failure
   assert_output --partial "Unknown option \"-z\""
 }
+
+@test "script fails with incorrect number of command line arguments" {
+  run rback minute 10 120 10 "${TEMP_TEST_DIR}/files" "${TEMP_TEST_DIR}" "${TEMP_TEST_DIR}"
+  assert_failure
+  assert_output --partial "6 or 8 expected"
+}
+
+@test "script fails with \"--\" and one too few command line arguments" {
+  run rback -- minute 10 120 10 "${TEMP_TEST_DIR}/files"
+  assert_failure
+  assert_output --partial "6 or 8 expected"
+}

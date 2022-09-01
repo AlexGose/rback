@@ -125,11 +125,17 @@ main() {
   while :; do
     case "$1" in
       -h|--help) usage; exit 0 ;; 
+      --) shift; break ;;
       -*) error "${FUNCNAME[0]}: ${LINENO[0]}: Unknown option \"$1\"" ;;
       *) break ;;
     esac
     shift
   done
+
+  if (( $# != 6 && $# != 8 )); then
+    usage
+    error "${FUNCNAME[0]}: ${LINENO[0]}: $# arguments, but 6 or 8 expected"
+  fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
