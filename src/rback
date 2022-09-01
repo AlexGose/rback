@@ -136,6 +136,28 @@ main() {
     usage
     error "${FUNCNAME[0]}: ${LINENO[0]}: $# arguments, but 6 or 8 expected"
   fi
+
+  local time_unit
+  time_unit="$1"
+  local start
+  start="$2"
+  local interval
+  interval="$3"
+  local limit
+  limit="$4"
+  local backup_dir
+  local target_dir
+
+  if (( $# == 6 )); then
+    backup_dir="$6"
+    local source_dir
+    source_dir="$5"
+
+    rotate "${backup_dir}" "${time_unit}" "${start}" "${interval}" "${limit}"
+
+    target_dir="${backup_dir}/${time_unit}.$(( start )).${interval}"
+    rsync -va "${source_dir}" "${target_dir}"
+  fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
