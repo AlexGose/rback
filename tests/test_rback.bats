@@ -119,10 +119,11 @@ check_usage_output() {
   assert_output --partial "6 or 8 expected"
 }
 
-@test "script backs up file" {
+@test "script backs up file and removes extra file" {
   mkdir "${TEMP_TEST_DIR}/files"
   echo "hello world" >"${TEMP_TEST_DIR}/files/test_file.txt"
   run rback hour 2 2 6 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}"
   assert_success
   assert_file_exists "${TEMP_TEST_DIR}/hour.2.2/test_file.txt"
+  assert_file_not_exists "${TEMP_TEST_DIR}/hour.2.2/c"
 }

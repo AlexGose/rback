@@ -156,7 +156,7 @@ main() {
     rotate "${backup_dir}" "${time_unit}" "${start}" "${interval}" "${limit}"
 
     target_dir="${backup_dir}/${time_unit}.$(( start )).${interval}"
-    rsync -va "${source_dir}" "${target_dir}"
+    rsync --delete -va "${source_dir}" "${target_dir}"
   fi
 }
 
