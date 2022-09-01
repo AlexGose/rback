@@ -127,3 +127,15 @@ check_usage_output() {
   assert_file_exists "${TEMP_TEST_DIR}/hour.2.2/test_file.txt"
   assert_file_not_exists "${TEMP_TEST_DIR}/hour.2.2/c"
 }
+
+@test "script creates hard link from previous snapshot folder" {
+  mkdir "${TEMP_TEST_DIR}/files"
+  echo "hello world" >"${TEMP_TEST_DIR}/files/test_file.txt"
+  cp "${TEMP_TEST_DIR}/files/test_file.txt" \
+     "${TEMP_TEST_DIR}/hour.2.2/test_file.txt"
+  run rback hour 2 2 6 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}"
+  assert_success
+  [ "$(ls -i "${TEMP_TEST_DIR}/hour.2.2/test_file.txt" | awk '{print $1}')" \
+    == "$(ls -i "${TEMP_TEST_DIR}/hour.4.2/test_file.txt" | awk '{print $1}')" ]
+}
+

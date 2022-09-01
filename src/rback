@@ -147,6 +147,7 @@ main() {
   limit="$4"
   local backup_dir
   local target_dir
+  local link_dest
 
   if (( $# == 6 )); then
     backup_dir="$6"
@@ -156,7 +157,9 @@ main() {
     rotate "${backup_dir}" "${time_unit}" "${start}" "${interval}" "${limit}"
 
     target_dir="${backup_dir}/${time_unit}.$(( start )).${interval}"
-    rsync --delete -va "${source_dir}" "${target_dir}"
+    link_dest="${backup_dir}/${time_unit}.$(( start + interval )).${interval}"
+    rsync --link-dest="${link_dest}" --delete -va \
+        "${source_dir}" "${target_dir}"
   fi
 }
 
