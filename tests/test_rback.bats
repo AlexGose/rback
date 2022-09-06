@@ -126,6 +126,8 @@ check_usage_output() {
   assert_success
   assert_file_exists "${TEMP_TEST_DIR}/hour.2.2/test_file.txt"
   assert_file_not_exists "${TEMP_TEST_DIR}/hour.2.2/c"
+  [ "$(ls -i "${TEMP_TEST_DIR}/hour.2.2/test_file.txt" | awk '{print $1}')" \
+    != "$(ls -i "${TEMP_TEST_DIR}/files/test_file.txt" | awk '{print $1}')" ]
 }
 
 @test "script creates hard link from previous snapshot folder" {
@@ -137,6 +139,8 @@ check_usage_output() {
   assert_success
   [ "$(ls -i "${TEMP_TEST_DIR}/hour.2.2/test_file.txt" | awk '{print $1}')" \
     == "$(ls -i "${TEMP_TEST_DIR}/hour.4.2/test_file.txt" | awk '{print $1}')" ]
+  [ "$(ls -i "${TEMP_TEST_DIR}/hour.2.2/test_file.txt" | awk '{print $1}')" \
+    != "$(ls -i "${TEMP_TEST_DIR}/files/test_file.txt" | awk '{print $1}')" ]
 }
 
 @test "script updates snapshot with another snapshot" {
