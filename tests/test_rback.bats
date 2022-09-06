@@ -139,3 +139,19 @@ check_usage_output() {
     == "$(ls -i "${TEMP_TEST_DIR}/hour.4.2/test_file.txt" | awk '{print $1}')" ]
 }
 
+@test "script updates snapshot with another snapshot" {
+  touch "${TEMP_TEST_DIR}/hour.6.2/a.txt"
+  touch "${TEMP_TEST_DIR}/hour.6.2/b.txt"
+  mkdir "${TEMP_TEST_DIR}/minute.120.30"
+  ln "${TEMP_TEST_DIR}/hour.6.2/a.txt" "${TEMP_TEST_DIR}/minute.120.30/a.txt"
+  touch "${TEMP_TEST_DIR}/minute.120.30/c.txt"
+  
+  run rback hour 2 2 6 minute 120 30 "${TEMP_TEST_DIR}"
+  assert_success
+  assert_file_not_exists "${TEMP_TEST_DIR}/hour.2.2/b.txt"
+  assert_file_exists "${TEMP_TEST_DIR}/hour.2.2/c.txt"
+  [ "$(ls -i "${TEMP_TEST_DIR}/minute.120.30/a.txt" | awk '{print $1}')" \
+    == "$(ls -i "${TEMP_TEST_DIR}/hour.2.2/a.txt" | awk '{print $1}')" ]
+  [ "$(ls -i "${TEMP_TEST_DIR}/minute.120.30/c.txt" | awk '{print $1}')" \
+    == "$(ls -i "${TEMP_TEST_DIR}/hour.2.2/c.txt" | awk '{print $1}')" ]
+}

@@ -154,21 +154,23 @@ main() {
   local limit
   limit="$4"
   local backup_dir
-  local target_dir
+  local source_dir
   local link_dest
+  local target_dir
 
   if (( $# == 6 )); then
     backup_dir="$6"
-    local source_dir
     source_dir="$5"
-
-    rotate "${backup_dir}" "${time_unit}" "${start}" "${interval}" "${limit}"
-
-    target_dir="${backup_dir}/${time_unit}.$(( start )).${interval}"
     link_dest="${backup_dir}/${time_unit}.$(( start + interval )).${interval}"
-    rsync --link-dest="${link_dest}" --delete -va \
-        "${source_dir}" "${target_dir}"
+  elif (( $# == 8 )); then
+    backup_dir="$8"
+    source_dir="${backup_dir}/$5.$6.$7/"
+    link_dest="${source_dir}"
   fi
+  
+  rotate "${backup_dir}" "${time_unit}" "${start}" "${interval}" "${limit}"
+  target_dir="${backup_dir}/${time_unit}.$(( start )).${interval}"
+  rsync --link-dest="${link_dest}" --delete -va "${source_dir}" "${target_dir}"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
