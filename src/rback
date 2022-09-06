@@ -171,7 +171,8 @@ main() {
   
   rotate "${backup_dir}" "${time_unit}" "${start}" "${interval}" "${limit}"
   target_dir="${backup_dir}/${time_unit}.$(( start )).${interval}"
-  rsync --link-dest="${link_dest}" --delete -va "${source_dir}" "${target_dir}"
+  rsync --link-dest="${link_dest}" --delete -va -- "${source_dir}" \
+      "${target_dir}"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
