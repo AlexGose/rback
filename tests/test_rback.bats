@@ -119,11 +119,20 @@ assert_inodes_not_equal() {
   assert_output --partial "Unknown option \"-z\""
 }
 
-@test "script fails with incorrect number of command line arguments" {
+@test "script with \"-r\" option fails with too many command line arguments" {
   run rback -r minute 10 120 10 hour 2 2 "${TEMP_TEST_DIR}/files" \
       "${TEMP_TEST_DIR}"
   assert_failure
   assert_output --partial "expected 8"
+}
+
+@test "script fails with fewer than 6 command line arguments" {
+  run rback -- minute 30 30 480 "${TEMP_TEST_DIR}"
+  assert_failure
+  assert_output --partial "at least 6 required"
+  run rback --rotate minute 30 30 480 "${TEMP_TEST_DIR}"
+  assert_failure
+  assert_output --partial "at least 6 required"
 }
 
 @test "script fails with \"--\" and one too few command line arguments" {

@@ -146,6 +146,10 @@ main() {
     shift
   done
 
+  if (( $# < 6  )); then
+    usage
+    error "${FUNCNAME[0]}: ${LINENO[0]}: $# arguments, but at least 6 required"
+  fi
   if [[ "${rotate_flag}" == "true" ]] && (( $# != 8 )); then
     usage
     error "${FUNCNAME[0]}: ${LINENO[0]}: $# arguments, but expected 8"
