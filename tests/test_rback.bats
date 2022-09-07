@@ -24,6 +24,24 @@ teardown() {
   rm -rf "${TEMP_TEST_DIR}"
 }
 
+check_usage_output() {
+  assert_success
+  assert_output --partial "Usage:"
+  assert_output --partial "-h"
+}
+
+get_inode() {
+  ls -i "$1" | awk '{print $1}'
+}
+
+assert_inodes_equal() {
+  [ "$(get_inode "$1")" == "$(get_inode "$2")" ]
+}
+
+assert_inodes_not_equal() {
+  [ "$(get_inode "$1")" != "$(get_inode "$2")" ]
+}
+
 @test "script file exists" {
   assert_file_exists src/rback
 }
@@ -35,12 +53,6 @@ teardown() {
 @test "script fails without command options" {
   run rback
   assert_failure
-}
-
-check_usage_output() {
-  assert_success
-  assert_output --partial "Usage:"
-  assert_output --partial "-h"
 }
 
 @test "test usage function" {
@@ -127,8 +139,8 @@ check_usage_output() {
   assert_success
   assert_file_exists "${TEMP_TEST_DIR}/hour.2.2/test_file.txt"
   assert_file_not_exists "${TEMP_TEST_DIR}/hour.2.2/c"
-  [ "$(ls -i "${TEMP_TEST_DIR}/hour.2.2/test_file.txt" | awk '{print $1}')" \
-    != "$(ls -i "${TEMP_TEST_DIR}/files/test_file.txt" | awk '{print $1}')" ]
+  assert_inodes_not_equal "${TEMP_TEST_DIR}/hour.2.2/test_file.txt" \
+      "${TEMP_TEST_DIR}/files/test_file.txt" 
 }
 
 @test "script backs up files from two directories" {
@@ -148,10 +160,10 @@ check_usage_output() {
      "${TEMP_TEST_DIR}/hour.2.2/test_file.txt"
   run rback hour 2 2 6 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}"
   assert_success
-  [ "$(ls -i "${TEMP_TEST_DIR}/hour.2.2/test_file.txt" | awk '{print $1}')" \
-    == "$(ls -i "${TEMP_TEST_DIR}/hour.4.2/test_file.txt" | awk '{print $1}')" ]
-  [ "$(ls -i "${TEMP_TEST_DIR}/hour.2.2/test_file.txt" | awk '{print $1}')" \
-    != "$(ls -i "${TEMP_TEST_DIR}/files/test_file.txt" | awk '{print $1}')" ]
+  assert_inodes_equal "${TEMP_TEST_DIR}/hour.2.2/test_file.txt" \
+      "${TEMP_TEST_DIR}/hour.4.2/test_file.txt" 
+  assert_inodes_not_equal "${TEMP_TEST_DIR}/hour.2.2/test_file.txt" \
+      "${TEMP_TEST_DIR}/files/test_file.txt" 
 }
 
 @test "script updates snapshot with another snapshot" {
@@ -165,8 +177,8 @@ check_usage_output() {
   assert_success
   assert_file_not_exists "${TEMP_TEST_DIR}/hour.2.2/b.txt"
   assert_file_exists "${TEMP_TEST_DIR}/hour.2.2/c.txt"
-  [ "$(ls -i "${TEMP_TEST_DIR}/minute.120.30/a.txt" | awk '{print $1}')" \
-    == "$(ls -i "${TEMP_TEST_DIR}/hour.2.2/a.txt" | awk '{print $1}')" ]
-  [ "$(ls -i "${TEMP_TEST_DIR}/minute.120.30/c.txt" | awk '{print $1}')" \
-    == "$(ls -i "${TEMP_TEST_DIR}/hour.2.2/c.txt" | awk '{print $1}')" ]
+  assert_inodes_equal "${TEMP_TEST_DIR}/minute.120.30/a.txt" \
+      "${TEMP_TEST_DIR}/hour.2.2/a.txt" 
+  assert_inodes_equal "${TEMP_TEST_DIR}/minute.120.30/c.txt" \
+      "${TEMP_TEST_DIR}/hour.2.2/c.txt" 
 }
