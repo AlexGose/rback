@@ -131,9 +131,13 @@ main() {
     error "${FUNCNAME[0]}: ${LINENO[0]}: at least one option required"
   fi
 
+  local rotate_flag
+  rotate_flag="false"
+
   while :; do
     case "$1" in
       -h|--help) usage; exit 0 ;; 
+      -r|--rotate) rotate_flag="true" ;;
       --) shift; break ;;
       -*) error "${FUNCNAME[0]}: ${LINENO[0]}: Unknown option \"$1\"" ;;
       *) break ;;
@@ -141,37 +145,49 @@ main() {
     shift
   done
 
-  if (( $# != 6 && $# != 8 )); then
+  if [[ "${rotate_flag}" == "true" ]] && (( $# != 8 )); then
     usage
-    error "${FUNCNAME[0]}: ${LINENO[0]}: $# arguments, but 6 or 8 expected"
+    error "${FUNCNAME[0]}: ${LINENO[0]}: $# arguments, but expected 8"
   fi
 
   local time_unit
   time_unit="$1"
+  shift
+  
   local start
-  start="$2"
+  start="$1"
+  shift
+  
   local interval
-  interval="$3"
+  interval="$1"
+  shift
+  
   local limit
-  limit="$4"
+  limit="$1"
+  shift
+  
   local backup_dir
   local source_dir
   local link_dest
   local target_dir
 
-  if (( $# == 6 )); then
-    backup_dir="$6"
-    source_dir="$5"
+  if [[ "${rotate_flag}" == "false" ]]; then
+    source_dir=()
+    while (( $# > 1 )); do
+      source_dir+=("$1")
+      shift
+    done
+    backup_dir="$1"
     link_dest="${backup_dir}/${time_unit}.$(( start + interval )).${interval}"
-  elif (( $# == 8 )); then
-    backup_dir="$8"
-    source_dir="${backup_dir}/$5.$6.$7/"
-    link_dest="${source_dir}"
+  else
+    backup_dir="$4"
+    source_dir=("${backup_dir}/$1.$2.$3/")
+    link_dest="${source_dir[0]}"
   fi
   
   rotate "${backup_dir}" "${time_unit}" "${start}" "${interval}" "${limit}"
   target_dir="${backup_dir}/${time_unit}.$(( start )).${interval}"
-  rsync --link-dest="${link_dest}" --delete -va -- "${source_dir}" \
+  rsync --link-dest="${link_dest}" --delete -va -- "${source_dir[@]}" \
       "${target_dir}"
 }
 

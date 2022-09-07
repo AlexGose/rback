@@ -108,15 +108,16 @@ check_usage_output() {
 }
 
 @test "script fails with incorrect number of command line arguments" {
-  run rback minute 10 120 10 "${TEMP_TEST_DIR}/files" "${TEMP_TEST_DIR}" "${TEMP_TEST_DIR}"
+  run rback -r minute 10 120 10 hour 2 2 "${TEMP_TEST_DIR}/files" \
+      "${TEMP_TEST_DIR}"
   assert_failure
-  assert_output --partial "6 or 8 expected"
+  assert_output --partial "expected 8"
 }
 
 @test "script fails with \"--\" and one too few command line arguments" {
-  run rback -- minute 10 120 10 "${TEMP_TEST_DIR}/files"
+  run rback -r -- minute 10 120 10 hour 2 2
   assert_failure
-  assert_output --partial "6 or 8 expected"
+  assert_output --partial "expected 8"
 }
 
 @test "script backs up file and removes extra file" {
@@ -128,6 +129,16 @@ check_usage_output() {
   assert_file_not_exists "${TEMP_TEST_DIR}/hour.2.2/c"
   [ "$(ls -i "${TEMP_TEST_DIR}/hour.2.2/test_file.txt" | awk '{print $1}')" \
     != "$(ls -i "${TEMP_TEST_DIR}/files/test_file.txt" | awk '{print $1}')" ]
+}
+
+@test "script backs up files from two directories" {
+  mkdir "${TEMP_TEST_DIR}/dir with spaces" "${TEMP_TEST_DIR}/files"
+  touch "${TEMP_TEST_DIR}/dir with spaces/a" "${TEMP_TEST_DIR}/files/b"
+  run rback -- hour 2 2 6 "${TEMP_TEST_DIR}/dir with spaces/" \
+      "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}"
+  assert_success
+  assert_file_exists "${TEMP_TEST_DIR}/hour.2.2/a"
+  assert_file_exists "${TEMP_TEST_DIR}/hour.2.2/b"
 }
 
 @test "script creates hard link from previous snapshot folder" {
@@ -150,7 +161,7 @@ check_usage_output() {
   ln "${TEMP_TEST_DIR}/hour.6.2/a.txt" "${TEMP_TEST_DIR}/minute.120.30/a.txt"
   touch "${TEMP_TEST_DIR}/minute.120.30/c.txt"
   
-  run rback hour 2 2 6 minute 120 30 "${TEMP_TEST_DIR}"
+  run rback --rotate -- hour 2 2 6 minute 120 30 "${TEMP_TEST_DIR}"
   assert_success
   assert_file_not_exists "${TEMP_TEST_DIR}/hour.2.2/b.txt"
   assert_file_exists "${TEMP_TEST_DIR}/hour.2.2/c.txt"
