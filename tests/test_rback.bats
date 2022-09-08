@@ -181,7 +181,7 @@ assert_inodes_not_equal() {
   mkdir "${TEMP_TEST_DIR}/minute.120.30"
   ln "${TEMP_TEST_DIR}/hour.6.2/a.txt" "${TEMP_TEST_DIR}/minute.120.30/a.txt"
   touch "${TEMP_TEST_DIR}/minute.120.30/c.txt"
-  
+
   run rback --rotate -- hour 2 2 6 minute 120 30 "${TEMP_TEST_DIR}"
   assert_success
   assert_file_not_exists "${TEMP_TEST_DIR}/hour.2.2/b.txt"
@@ -190,4 +190,45 @@ assert_inodes_not_equal() {
       "${TEMP_TEST_DIR}/hour.2.2/a.txt" 
   assert_inodes_equal "${TEMP_TEST_DIR}/minute.120.30/c.txt" \
       "${TEMP_TEST_DIR}/hour.2.2/c.txt" 
+}
+
+@test "script fails when given invalid second argument" {
+  mkdir "${TEMP_TEST_DIR}/files"
+  run rback hour 2.2 2 6 "${TEMP_TEST_DIR}/files" "${TEMP_TEST_DIR}"
+  assert_failure
+  assert_output --partial "expected a positive integer"
+  assert_output --partial "second argument"
+}
+
+
+@test "script fails when given invalid third argument" {
+  mkdir "${TEMP_TEST_DIR}/files"
+  run rback hour 2 -07 6 "${TEMP_TEST_DIR}/files" "${TEMP_TEST_DIR}"
+  assert_failure
+  assert_output --partial "expected a positive integer"
+  assert_output --partial "third argument"
+}
+
+@test "script fails when given invalid fourth argument" {
+  mkdir "${TEMP_TEST_DIR}/files"
+  run rback hour 2 2 0 "${TEMP_TEST_DIR}/files" "${TEMP_TEST_DIR}"
+  assert_failure
+  assert_output --partial "expected a positive integer"
+  assert_output --partial "fourth argument"
+}
+
+@test "script fails with \"-r\" option and invalid sixth argument" {
+  mkdir "${TEMP_TEST_DIR}/files"
+  run rback -r hour 2 2 6 minute 120.5 30 "${TEMP_TEST_DIR}"
+  assert_failure
+  assert_output --partial "expected a positive integer"
+  assert_output --partial "sixth argument"
+}
+
+@test "script fails with \"-r\" option and invalid seventh argument" {
+  mkdir "${TEMP_TEST_DIR}/files"
+  run rback -r hour 2 2 6 minute 120 thirty "${TEMP_TEST_DIR}"
+  assert_failure
+  assert_output --partial "expected a positive integer"
+  assert_output --partial "seventh argument"
 }

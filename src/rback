@@ -126,6 +126,12 @@ update() {
   fi
 }
 
+assert_positive_int_arg() {
+  if ! [[ "$1" =~ ^[1-9][0-9]*$ ]]; then
+    error "$2: $3: $4 argument: $1, but expected a positive integer"
+  fi
+}
+
 main() {
   if (( $# == 0 )); then
     usage
@@ -159,14 +165,17 @@ main() {
   time_unit="$1"
   shift
   
+  assert_positive_int_arg "$1" "${FUNCNAME[0]}" "${LINENO[0]}" "second"
   local start
   start="$1"
   shift
   
+  assert_positive_int_arg "$1" "${FUNCNAME[0]}" "${LINENO[0]}" "third"
   local interval
   interval="$1"
   shift
   
+  assert_positive_int_arg "$1" "${FUNCNAME[0]}" "${LINENO[0]}" "fourth"
   local limit
   limit="$1"
   shift
@@ -186,6 +195,8 @@ main() {
     link_dest="${backup_dir}/${time_unit}.$(( start + interval )).${interval}"
   else
     backup_dir="$4"
+    assert_positive_int_arg "$2" "${FUNCNAME[0]}" "${LINENO[0]}" "sixth"
+    assert_positive_int_arg "$3" "${FUNCNAME[0]}" "${LINENO[0]}" "seventh"
     source_dir=("${backup_dir}/$1.$2.$3/")
     link_dest="${source_dir[0]}"
   fi
