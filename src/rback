@@ -7,6 +7,12 @@ error() {
   exit 1
 }
 
+assert_positive_int_arg() {
+  if ! [[ "$1" =~ ^[1-9][0-9]*$ ]]; then
+    error "$2: $3: $4 argument: $1, but expected a positive integer"
+  fi
+}
+
 usage() {
   local usage_string
   usage_string="Usage: rback -h
@@ -123,12 +129,6 @@ update() {
     local error_prefix
     error_prefix="${FUNCNAME[0]}: ${LINENO[0]}:"
     error "${error_prefix} $# arguments were passed, but expected 4 or 5."
-  fi
-}
-
-assert_positive_int_arg() {
-  if ! [[ "$1" =~ ^[1-9][0-9]*$ ]]; then
-    error "$2: $3: $4 argument: $1, but expected a positive integer"
   fi
 }
 
