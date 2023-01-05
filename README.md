@@ -19,3 +19,17 @@ Usage: rback -h
     SRC                 Path to source directory or file(s) to be backed up
     DEST                Path to backup folder where snapshots will be stored
 ```
+
+## Docker
+
+If you have [Docker](https://docker.com) installed, then build the Docker image using the [Dockerfile](Dockerfile):
+
+```
+docker build -t rbacktest
+```
+
+Run the tests in the container:
+
+```
+docker run -it --rm -v "${PWD}:/code" --name rbacktest rbacktest
+```
