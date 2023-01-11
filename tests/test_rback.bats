@@ -232,3 +232,21 @@ assert_inodes_not_equal() {
   assert_output --partial "expected a positive integer"
   assert_output --partial "seventh argument"
 }
+
+@test "the user backs up a file but excludes another file" {
+  assert_dir_exists "${TEMP_TEST_DIR}" 
+  # none of the relevant backup snapshot directories exist
+  assert_dir_not_exists "${TEMP_TEST_DIR}/hour.4.4" 
+  assert_dir_not_exists "${TEMP_TEST_DIR}/hour.8.4" 
+  assert_dir_not_exists "${TEMP_TEST_DIR}/hour.12.4" 
+  mkdir "${TEMP_TEST_DIR}/files"
+  touch "${TEMP_TEST_DIR}/files/my_file.txt" # file to backup
+  touch "${TEMP_TEST_DIR}/files/exclude_me.txt" # file to exclude
+  
+  echo "- exclude_me.txt" > "${TEMP_TEST_DIR}/excludes"
+  run rback -x "${TEMP_TEST_DIR}/excludes" -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}/"
+  
+  assert_success
+  diff "${TEMP_TEST_DIR}/files/my_file.txt" "${TEMP_TEST_DIR}/hour.4.4/my_file.txt"
+  assert_file_not_exists "${TEMP_TEST_DIR}/hour.4.4/exclude_me.txt"
+}

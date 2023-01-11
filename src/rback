@@ -140,11 +140,14 @@ main() {
 
   local rotate_flag
   rotate_flag="false"
+  local exclude_file
+  exclude_file=""
 
   while :; do
     case "$1" in
       -h|--help) usage; exit 0 ;; 
       -r|--rotate) rotate_flag="true" ;;
+      -x|--exclude-file|--exclude-from) exclude_file="$2"; shift ;;
       --) shift; break ;;
       -*) error "${FUNCNAME[0]}: ${LINENO[0]}: Unknown option \"$1\"" ;;
       *) break ;;
@@ -203,8 +206,14 @@ main() {
   
   rotate "${backup_dir}" "${time_unit}" "${start}" "${interval}" "${limit}"
   target_dir="${backup_dir}/${time_unit}.$(( start )).${interval}"
-  rsync --link-dest="${link_dest}" --delete -va -- "${source_dir[@]}" \
-      "${target_dir}"
+  if [[ -f "${exclude_file}" ]]; then
+    rsync --link-dest="${link_dest}" --delete -va \
+        --exclude-from="${exclude_file}" \
+        -- "${source_dir[@]}" "${target_dir}"
+  else
+    rsync --link-dest="${link_dest}" --delete -va \
+        -- "${source_dir[@]}" "${target_dir}"
+  fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
