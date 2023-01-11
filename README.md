@@ -25,7 +25,7 @@ Usage: rback -h
 If you have [Docker](https://docker.com) installed, then build the Docker image using the [Dockerfile](Dockerfile):
 
 ```
-docker build -t rbacktest
+docker build -t rbacktest .
 ```
 
 Run the tests in the container:
