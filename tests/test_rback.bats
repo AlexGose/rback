@@ -17,6 +17,11 @@ setup() {
   touch hour.2.2/a hour.4.2/b hour.6.2/c
   cd "${work_dir}"
 
+  assert_dir_exists "${TEMP_TEST_DIR}"
+  assert_dir_not_exists "${TEMP_TEST_DIR}/hour.4.4"
+  assert_dir_not_exists "${TEMP_TEST_DIR}/hour.8.4"
+  assert_dir_not_exists "${TEMP_TEST_DIR}/hour.12.4"
+
   source rback
 }
 
@@ -234,11 +239,6 @@ assert_inodes_not_equal() {
 }
 
 @test "the user backs up a file but excludes another file" {
-  assert_dir_exists "${TEMP_TEST_DIR}" 
-  # none of the relevant backup snapshot directories exist
-  assert_dir_not_exists "${TEMP_TEST_DIR}/hour.4.4" 
-  assert_dir_not_exists "${TEMP_TEST_DIR}/hour.8.4" 
-  assert_dir_not_exists "${TEMP_TEST_DIR}/hour.12.4" 
   mkdir "${TEMP_TEST_DIR}/files"
   touch "${TEMP_TEST_DIR}/files/my_file.txt" # file to backup
   touch "${TEMP_TEST_DIR}/files/exclude_me.txt" # file to exclude
