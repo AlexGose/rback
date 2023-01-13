@@ -250,3 +250,17 @@ assert_inodes_not_equal() {
   diff "${TEMP_TEST_DIR}/files/my_file.txt" "${TEMP_TEST_DIR}/hour.4.4/my_file.txt"
   assert_file_not_exists "${TEMP_TEST_DIR}/hour.4.4/exclude_me.txt"
 }
+
+@test "the user backs up a file but excludes a non-empty directory" {
+  mkdir "${TEMP_TEST_DIR}/files"
+  mkdir "${TEMP_TEST_DIR}/files/do_not_copy"
+  echo "hello world" > "${TEMP_TEST_DIR}/files/do_not_copy/hello"
+  touch "${TEMP_TEST_DIR}/files/my_file.txt"
+
+  echo "- do_not_copy" > "${TEMP_TEST_DIR}/excludes"
+  run rback -x "${TEMP_TEST_DIR}/excludes" -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}/"
+
+  assert_success
+  diff "${TEMP_TEST_DIR}/files/my_file.txt" "${TEMP_TEST_DIR}/hour.4.4/my_file.txt"
+  assert_dir_not_exists "${TEMP_TEST_DIR}/hour.4.4/do_not_copy"
+}
