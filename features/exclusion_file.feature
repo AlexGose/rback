@@ -32,3 +32,9 @@ Scenario: The user backs up a file in a directory but excludes a non-empty subdi
     And executes "rback -x ${TEMP_TEST_DIR}/excludes -- hour 4 4 12 ${TEMP_TEST_DIR}/files/ ${TEMP_TEST_DIR}/"
     Then a copy of "${TEMP_TEST_DIR}/my_file.txt" is made at "${TEMP_TEST_DIR}/hour.4.4/subdir/my_file.txt"
     But "${TEMP_TEST_DIR}/files/subdir/do_not_copy" is not copied into the "${TEMP_TEST_DIR}/hour.4.4/" directory
+
+Scenario: The user looks up the command line option for including an exclusion file
+    When the user types "rback -h"
+    Then "[--exclude-file <filename>]" is shown in the usage information for "rback"
+    And "[--exclude-file <filename>]" is shown in the usage information for "rback -r"
+    And the options "-x, --exclude-file" appear as well

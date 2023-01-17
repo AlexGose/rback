@@ -6,11 +6,14 @@
 $ src/rback -h
 
 Usage: rback -h
-       rback -- UNIT START INTERVAL LIMIT SRC1 [ SRC2 [ ... ] ] DEST
-       rback -r -- UNIT1 START1 INTERVAL1 LIMIT1 UNIT2 START2 INTERVAL2 DEST
+       rback [--exclude-file <filename>] -- UNIT START INTERVAL LIMIT SRC1 \
+           [ SRC2 [ ... ] ] DEST
+       rback -r [--exclude-file <filename>] -- UNIT1 START1 INTERVAL1 LIMIT1 \
+           UNIT2 START2 INTERVAL2 DEST
   OPTIONS
     -h, --help          Display this help message
     -r, --rotate        Rotate snapshots.  Update snapshots without backing up
+    -x, --exclude-file  Flag for exclusion file passed to Rsync
   ARGS
     UNIT                Unit of time (minute, hour, day, week, month, etc.)
     START               Integer elapsed start time, time for first snapshot
