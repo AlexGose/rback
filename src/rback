@@ -16,11 +16,14 @@ assert_positive_int_arg() {
 usage() {
   local usage_string
   usage_string="Usage: rback -h
-       rback -- UNIT START INTERVAL LIMIT SRC1 [ SRC2 [ ... ] ] DEST
-       rback -r -- UNIT1 START1 INTERVAL1 LIMIT1 UNIT2 START2 INTERVAL2 DEST
+       rback [--exclude-file <filename>] -- UNIT START INTERVAL LIMIT SRC1 \\
+           [ SRC2 [ ... ] ] DEST
+       rback -r [--exclude-file <filename>] -- UNIT1 START1 INTERVAL1 LIMIT1 \\
+           UNIT2 START2 INTERVAL2 DEST
   OPTIONS
     -h, --help          Display this help message
     -r, --rotate        Rotate snapshots.  Update snapshots without backing up
+    -x, --exclude-file  Flag for exclusion file passed to Rsync
   ARGS
     UNIT                Unit of time (minute, hour, day, week, month, etc.)
     START               Integer elapsed start time, time for first snapshot
@@ -140,11 +143,14 @@ main() {
 
   local rotate_flag
   rotate_flag="false"
+  local exclude_file
+  exclude_file=""
 
   while :; do
     case "$1" in
       -h|--help) usage; exit 0 ;; 
       -r|--rotate) rotate_flag="true" ;;
+      -x|--exclude-file|--exclude-from) exclude_file="$2"; shift ;;
       --) shift; break ;;
       -*) error "${FUNCNAME[0]}: ${LINENO[0]}: Unknown option \"$1\"" ;;
       *) break ;;
@@ -203,8 +209,14 @@ main() {
   
   rotate "${backup_dir}" "${time_unit}" "${start}" "${interval}" "${limit}"
   target_dir="${backup_dir}/${time_unit}.$(( start )).${interval}"
-  rsync --link-dest="${link_dest}" --delete -va -- "${source_dir[@]}" \
-      "${target_dir}"
+  if [[ -f "${exclude_file}" ]]; then
+    rsync --link-dest="${link_dest}" --delete -va \
+        --exclude-from="${exclude_file}" \
+        -- "${source_dir[@]}" "${target_dir}"
+  else
+    rsync --link-dest="${link_dest}" --delete -va \
+        -- "${source_dir[@]}" "${target_dir}"
+  fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then

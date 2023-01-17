@@ -17,6 +17,11 @@ setup() {
   touch hour.2.2/a hour.4.2/b hour.6.2/c
   cd "${work_dir}"
 
+  assert_dir_exists "${TEMP_TEST_DIR}"
+  assert_dir_not_exists "${TEMP_TEST_DIR}/hour.4.4"
+  assert_dir_not_exists "${TEMP_TEST_DIR}/hour.8.4"
+  assert_dir_not_exists "${TEMP_TEST_DIR}/hour.12.4"
+
   source rback
 }
 
@@ -231,4 +236,51 @@ assert_inodes_not_equal() {
   assert_failure
   assert_output --partial "expected a positive integer"
   assert_output --partial "seventh argument"
+}
+
+@test "the user backs up a file but excludes another file" {
+  mkdir "${TEMP_TEST_DIR}/files"
+  touch "${TEMP_TEST_DIR}/files/my_file.txt" # file to backup
+  touch "${TEMP_TEST_DIR}/files/exclude_me.txt" # file to exclude
+  
+  echo "- exclude_me.txt" > "${TEMP_TEST_DIR}/excludes"
+  run rback -x "${TEMP_TEST_DIR}/excludes" -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}/"
+  
+  assert_success
+  diff "${TEMP_TEST_DIR}/files/my_file.txt" "${TEMP_TEST_DIR}/hour.4.4/my_file.txt"
+  assert_file_not_exists "${TEMP_TEST_DIR}/hour.4.4/exclude_me.txt"
+}
+
+@test "the user backs up a file but excludes a non-empty directory" {
+  mkdir "${TEMP_TEST_DIR}/files"
+  mkdir "${TEMP_TEST_DIR}/files/do_not_copy"
+  echo "hello world" > "${TEMP_TEST_DIR}/files/do_not_copy/hello"
+  touch "${TEMP_TEST_DIR}/files/my_file.txt"
+
+  echo "- do_not_copy" > "${TEMP_TEST_DIR}/excludes"
+  run rback -x "${TEMP_TEST_DIR}/excludes" -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}/"
+
+  assert_success
+  diff "${TEMP_TEST_DIR}/files/my_file.txt" "${TEMP_TEST_DIR}/hour.4.4/my_file.txt"
+  assert_dir_not_exists "${TEMP_TEST_DIR}/hour.4.4/do_not_copy"
+}
+
+@test "the user backs up a file in a directory but excludes a non-empty subdirectory" {
+  mkdir -p "${TEMP_TEST_DIR}/files/subdir/do_not_copy"
+  echo "hello world" > "${TEMP_TEST_DIR}/files/subdir/do_not_copy/hello.txt"
+  touch "${TEMP_TEST_DIR}/files/subdir/my_file.txt"
+
+  echo "- subdir/do_not_copy" > "${TEMP_TEST_DIR}/excludes"
+  run rback -x "${TEMP_TEST_DIR}/excludes" -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}/"
+
+  assert_success
+  diff "${TEMP_TEST_DIR}/files/subdir/my_file.txt" "${TEMP_TEST_DIR}/hour.4.4/subdir/my_file.txt"
+  assert_dir_not_exists "${TEMP_TEST_DIR}/hour.4.4/subdir/do_not_copy"
+}
+
+@test "the user looks up the command line option for an exclusion file" {
+  run rback -h
+  assert_output --partial "rback [--exclude-file <filename>]"
+  assert_output --partial "rback -r [--exclude-file <filename>]"
+  assert_output --partial "-x, --exclude-file"
 }
