@@ -25,3 +25,12 @@ Scenario: The user backs up a file and deletes an excluded file in backup
     Then the command succeeds
     And a copy of "${TEMP_TEST_DIR}/files/my_file.txt" is made at "${TEMP_TEST_DIR}/hour.4.4/my_file.txt"
     But the file "${TEMP_TEST_DIR}/hour.4.4/exclude_me.txt" does not exists
+
+Scenario: The user backs up a file without deleting a non-empty backup directory
+    Given the file "${TEMP_TEST_DIR}/excludes" has one line "- do_not_delete"
+    And the non-empty directory "${TEMP_TEST_DIR}/hour.12.4/do_not_delete" exists
+    But the non-empty directory "${TEMP_TEST_DIR}/files/do_not_delete" does not exist
+    When the user executes "rback -x ${TEMP_TEST_DIR}/excludes -- hour 4 4 12 ${TEMP_TEST_DIR}/files/ ${TEMP_TEST_DIR}/"
+    Then the command succeeds
+    And a copy of "${TEMP_TEST_DIR}/files/my_file.txt" is made at "${TEMP_TEST_DIR}/hour.4.4/my_file.txt"
+    And the non-empty directory "${TEMP_TEST_DIR}/hour.4.4/do_not_delete" exists
