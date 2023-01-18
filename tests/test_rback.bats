@@ -278,6 +278,13 @@ assert_inodes_not_equal() {
   assert_dir_not_exists "${TEMP_TEST_DIR}/hour.4.4/subdir/do_not_copy"
 }
 
+@test "the user looks up the command line option for an exclusion file" {
+  run rback -h
+  assert_output --partial "rback [--exclude-file <filename>]"
+  assert_output --partial "rback -r [--exclude-file <filename>]"
+  assert_output --partial "-x, --exclude-file"
+}
+
 @test "the user backs up a file without deleting an excluded file in backup" {
   mkdir "${TEMP_TEST_DIR}/files"
   touch "${TEMP_TEST_DIR}/files/my_file.txt"
