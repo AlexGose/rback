@@ -345,3 +345,11 @@ assert_inodes_not_equal() {
   diff "${TEMP_TEST_DIR}/files/my_file.txt" "${TEMP_TEST_DIR}/hour.4.4/my_file.txt"
   assert_dir_not_exists "${TEMP_TEST_DIR}/hour.4.4/delete_me"
 }
+
+@test "The user forgets the \"-x\" option when using \"--delete-excluded\"" {
+  mkdir "${TEMP_TEST_DIR}/files"
+  touch "${TEMP_TEST_DIR}/files/my_file.txt"
+run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}"
+  assert_failure
+  assert_output --partial "\"-x\" is required with \"-d\""
+}

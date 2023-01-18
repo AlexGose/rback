@@ -43,3 +43,8 @@ Scenario: The user backs up a file and deletes a non-empty backup directory
     Then the command succeeds
     And a copy of "${TEMP_TEST_DIR}/files/my_file.txt" is made at "${TEMP_TEST_DIR}/hour.4.4/my_file.txt"
     But the directory "${TEMP_TEST_DIR}/hour.4.4/delete_me" does not exist
+
+Scenario: The user forgets the "-x" option when using "--delete-excluded"
+    When the user executes "rback --delete-excluded -- hour 4 4 12 ${TEMP_TEST_DIR}/files/ ${TEMP_TEST_DIR}/"
+    Then the command fails
+    And the error message '"-x" is required with "-d"' appears
