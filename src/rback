@@ -209,14 +209,16 @@ main() {
   
   rotate "${backup_dir}" "${time_unit}" "${start}" "${interval}" "${limit}"
   target_dir="${backup_dir}/${time_unit}.$(( start )).${interval}"
+
+  local rsync_opts
+  rsync_opts=("--link-dest=${link_dest}" --delete -va)
+  local rsync_args
+  rsync_args=("${source_dir[@]}" "${target_dir}")
+
   if [[ -f "${exclude_file}" ]]; then
-    rsync --link-dest="${link_dest}" --delete -va \
-        --exclude-from="${exclude_file}" \
-        -- "${source_dir[@]}" "${target_dir}"
-  else
-    rsync --link-dest="${link_dest}" --delete -va \
-        -- "${source_dir[@]}" "${target_dir}"
+    rsync_opts+=("--exclude-from=${exclude_file}")
   fi
+  rsync "${rsync_opts[@]}" -- "${rsync_args[@]}"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
