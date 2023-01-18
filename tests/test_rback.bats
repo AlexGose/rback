@@ -330,3 +330,18 @@ assert_inodes_not_equal() {
   assert_dir_exists "${TEMP_TEST_DIR}/hour.4.4/do_not_delete"
   assert_file_exists "${TEMP_TEST_DIR}/hour.4.4/do_not_delete/hello.txt"
 }
+
+@test "The user backs up a file and deletes a non-empty backup directory" {
+  mkdir "${TEMP_TEST_DIR}/files"
+  touch "${TEMP_TEST_DIR}/files/my_file.txt"
+  echo "- delete_me" > "${TEMP_TEST_DIR}/excludes"
+  mkdir -p "${TEMP_TEST_DIR}/hour.12.4/delete_me" 
+  echo "hello world" > "${TEMP_TEST_DIR}/hour.12.4/delete_me/hello.txt"
+  assert_file_not_exists "${TEMP_TEST_DIR}/files/delete_me"
+ 
+  run rback --delete-excluded -x "${TEMP_TEST_DIR}/excludes" -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}"
+
+  assert_success
+  diff "${TEMP_TEST_DIR}/files/my_file.txt" "${TEMP_TEST_DIR}/hour.4.4/my_file.txt"
+  assert_dir_not_exists "${TEMP_TEST_DIR}/hour.4.4/delete_me"
+}
