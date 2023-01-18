@@ -299,3 +299,18 @@ assert_inodes_not_equal() {
   diff "${TEMP_TEST_DIR}/files/my_file.txt" "${TEMP_TEST_DIR}/hour.4.4/my_file.txt"
   assert_file_exists "${TEMP_TEST_DIR}/hour.4.4/exclude_me.txt"
 }
+
+@test "The user backs up a file and deletes an excluded file in backup" {
+  mkdir "${TEMP_TEST_DIR}/files"
+  touch "${TEMP_TEST_DIR}/files/my_file.txt"
+  echo "- exclude_me.txt" > "${TEMP_TEST_DIR}/excludes"
+  mkdir "${TEMP_TEST_DIR}/hour.12.4"
+  touch "${TEMP_TEST_DIR}/hour.12.4/exclude_me.txt"
+  assert_file_not_exists "${TEMP_TEST_DIR}/files/exclude_me.txt"
+
+  run rback --delete-excluded -x "${TEMP_TEST_DIR}/excludes" -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}"
+
+  assert_success
+  diff "${TEMP_TEST_DIR}/files/my_file.txt" "${TEMP_TEST_DIR}/hour.4.4/my_file.txt"
+  assert_file_not_exists "${TEMP_TEST_DIR}/hour.4.4/exclude_me.txt"
+}

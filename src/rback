@@ -145,12 +145,15 @@ main() {
   rotate_flag="false"
   local exclude_file
   exclude_file=""
+  local delete_excluded
+  delete_excluded="false"
 
   while :; do
     case "$1" in
       -h|--help) usage; exit 0 ;; 
       -r|--rotate) rotate_flag="true" ;;
       -x|--exclude-file|--exclude-from) exclude_file="$2"; shift ;;
+      -d|--delete-excluded) delete_excluded="true" ;;
       --) shift; break ;;
       -*) error "${FUNCNAME[0]}: ${LINENO[0]}: Unknown option \"$1\"" ;;
       *) break ;;
@@ -217,6 +220,9 @@ main() {
 
   if [[ -f "${exclude_file}" ]]; then
     rsync_opts+=("--exclude-from=${exclude_file}")
+    if [[ "${delete_excluded}" == "true" ]]; then
+      rsync_opts+=("--delete-excluded")
+    fi
   fi
   rsync "${rsync_opts[@]}" -- "${rsync_args[@]}"
 }
