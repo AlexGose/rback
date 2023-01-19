@@ -353,3 +353,10 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
   assert_failure
   assert_output --partial "\"-x\" is required with \"-d\""
 }
+
+@test "the user looks up usage info for deleting excluded files and folders" {
+  run rback -h
+  assert_output --partial "rback [ [ --delete-excluded ] "
+  assert_output --regexp "rback -r [ [ --delete-excluded ] "
+  assert_output --partial "-d, --delete-excluded"
+}

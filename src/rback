@@ -16,21 +16,22 @@ assert_positive_int_arg() {
 usage() {
   local usage_string
   usage_string="Usage: rback -h
-       rback [ --exclude-file <filename> ] -- UNIT START INTERVAL LIMIT SRC1 \\
-           [ SRC2 [ ... ] ] DEST
-       rback -r [ --exclude-file <filename> ] -- UNIT1 START1 INTERVAL1 \\
-           LIMIT1 UNIT2 START2 INTERVAL2 DEST
+       rback [ [ --delete-excluded ] --exclude-file <filename> ] -- UNIT \\
+           START INTERVAL LIMIT SRC1 [ SRC2 [ ... ] ] DEST
+       rback -r [ [ --delete-excluded ] --exclude-file <filename> ] -- UNIT1 \\
+           START1 INTERVAL1 LIMIT1 UNIT2 START2 INTERVAL2 DEST
   OPTIONS
-    -h, --help          Display this help message
-    -r, --rotate        Rotate snapshots.  Update snapshots without backing up
-    -x, --exclude-file  Flag for exclusion file passed to Rsync
+    -h, --help            Display this help message
+    -r, --rotate          Rotate snapshots.  Update snapshots without back up
+    -x, --exclude-file    Flag for exclusion file passed to Rsync
+    -d, --delete-excluded Flag for deleting excluded backup files and folders
   ARGS
-    UNIT                Unit of time (minute, hour, day, week, month, etc.)
-    START               Integer elapsed start time, time for first snapshot
-    INTERVAL            Integer interval of elapsed time between snapshots
-    LIMIT               Integer limit of elapsed time, time for last snapshot
-    SRC                 Path to source directory or file(s) to be backed up
-    DEST                Path to backup folder where snapshots will be stored"
+    UNIT                  Unit of time (minute, hour, day, week, month, etc.)
+    START                 Integer elapsed start time, time for first snapshot
+    INTERVAL              Integer interval of elapsed time between snapshots
+    LIMIT                 Integer limit of elapsed time, time for last snapshot
+    SRC                   Path to source directory or file(s) to be backed up
+    DEST                  Path to backup folder where snapshots will be stored"
   echo "${usage_string}"
 }
 

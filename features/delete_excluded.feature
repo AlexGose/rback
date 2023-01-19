@@ -48,3 +48,9 @@ Scenario: The user forgets the "-x" option when using "--delete-excluded"
     When the user executes "rback --delete-excluded -- hour 4 4 12 ${TEMP_TEST_DIR}/files/ ${TEMP_TEST_DIR}/"
     Then the command fails
     And the error message '"-x" is required with "-d"' appears
+
+Scenario: The user looks up usage info for deleting excluded files and folders
+    When the user types "rback -h"
+    Then "rback [ [ --delete-excluded ] ..." is shown in the usage information for "rback"
+    And "rback -r [ [ --delete-excluded ] ..." is shown in the usage information for "rback -r"
+    And the options "-d, --delete-excluded" appear as well
