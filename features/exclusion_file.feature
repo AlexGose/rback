@@ -35,6 +35,6 @@ Scenario: The user backs up a file in a directory but excludes a non-empty subdi
 
 Scenario: The user looks up the command line option for including an exclusion file
     When the user types "rback -h"
-    Then "[--exclude-file <filename>]" is shown in the usage information for "rback"
-    And "[--exclude-file <filename>]" is shown in the usage information for "rback -r"
+    Then "[ ...--exclude-file <filename> ]" is shown in the usage information for "rback" where "..." represents any additional options
+    And "[ ...--exclude-file <filename> ]" is shown in the usage information for "rback -r" where "..." represents any additional options
     And the options "-x, --exclude-file" appear as well

@@ -280,7 +280,83 @@ assert_inodes_not_equal() {
 
 @test "the user looks up the command line option for an exclusion file" {
   run rback -h
-  assert_output --partial "rback [--exclude-file <filename>]"
-  assert_output --partial "rback -r [--exclude-file <filename>]"
+  assert_output --regexp "rback \[ .*--exclude-file <filename> \]"
+  assert_output --regexp "rback -r \[ .*--exclude-file <filename> \]"
   assert_output --partial "-x, --exclude-file"
+}
+
+@test "the user backs up a file without deleting an excluded file in backup" {
+  mkdir "${TEMP_TEST_DIR}/files"
+  touch "${TEMP_TEST_DIR}/files/my_file.txt"
+  echo "- exclude_me.txt" > "${TEMP_TEST_DIR}/excludes"
+  mkdir "${TEMP_TEST_DIR}/hour.12.4"
+  touch "${TEMP_TEST_DIR}/hour.12.4/exclude_me.txt"
+  assert_file_not_exists "${TEMP_TEST_DIR}/files/exclude_me.txt"
+
+  run rback -x "${TEMP_TEST_DIR}/excludes" -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}"
+
+  assert_success
+  diff "${TEMP_TEST_DIR}/files/my_file.txt" "${TEMP_TEST_DIR}/hour.4.4/my_file.txt"
+  assert_file_exists "${TEMP_TEST_DIR}/hour.4.4/exclude_me.txt"
+}
+
+@test "The user backs up a file and deletes an excluded file in backup" {
+  mkdir "${TEMP_TEST_DIR}/files"
+  touch "${TEMP_TEST_DIR}/files/my_file.txt"
+  echo "- exclude_me.txt" > "${TEMP_TEST_DIR}/excludes"
+  mkdir "${TEMP_TEST_DIR}/hour.12.4"
+  touch "${TEMP_TEST_DIR}/hour.12.4/exclude_me.txt"
+  assert_file_not_exists "${TEMP_TEST_DIR}/files/exclude_me.txt"
+
+  run rback --delete-excluded -x "${TEMP_TEST_DIR}/excludes" -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}"
+
+  assert_success
+  diff "${TEMP_TEST_DIR}/files/my_file.txt" "${TEMP_TEST_DIR}/hour.4.4/my_file.txt"
+  assert_file_not_exists "${TEMP_TEST_DIR}/hour.4.4/exclude_me.txt"
+}
+
+@test "The user backs up a file without deleting a non-empty backup directory" {
+  mkdir "${TEMP_TEST_DIR}/files"
+  touch "${TEMP_TEST_DIR}/files/my_file.txt"
+  echo "- do_not_delete" > "${TEMP_TEST_DIR}/excludes"
+  mkdir -p "${TEMP_TEST_DIR}/hour.12.4/do_not_delete" 
+  echo "hello world" > "${TEMP_TEST_DIR}/hour.12.4/do_not_delete/hello.txt"
+  assert_file_not_exists "${TEMP_TEST_DIR}/files/do_not_delete"
+  
+  run rback -x "${TEMP_TEST_DIR}/excludes" -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}"
+
+  assert_success
+  diff "${TEMP_TEST_DIR}/files/my_file.txt" "${TEMP_TEST_DIR}/hour.4.4/my_file.txt"
+  assert_dir_exists "${TEMP_TEST_DIR}/hour.4.4/do_not_delete"
+  assert_file_exists "${TEMP_TEST_DIR}/hour.4.4/do_not_delete/hello.txt"
+}
+
+@test "The user backs up a file and deletes a non-empty backup directory" {
+  mkdir "${TEMP_TEST_DIR}/files"
+  touch "${TEMP_TEST_DIR}/files/my_file.txt"
+  echo "- delete_me" > "${TEMP_TEST_DIR}/excludes"
+  mkdir -p "${TEMP_TEST_DIR}/hour.12.4/delete_me" 
+  echo "hello world" > "${TEMP_TEST_DIR}/hour.12.4/delete_me/hello.txt"
+  assert_file_not_exists "${TEMP_TEST_DIR}/files/delete_me"
+ 
+  run rback --delete-excluded -x "${TEMP_TEST_DIR}/excludes" -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}"
+
+  assert_success
+  diff "${TEMP_TEST_DIR}/files/my_file.txt" "${TEMP_TEST_DIR}/hour.4.4/my_file.txt"
+  assert_dir_not_exists "${TEMP_TEST_DIR}/hour.4.4/delete_me"
+}
+
+@test "The user forgets the \"-x\" option when using \"--delete-excluded\"" {
+  mkdir "${TEMP_TEST_DIR}/files"
+  touch "${TEMP_TEST_DIR}/files/my_file.txt"
+run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}"
+  assert_failure
+  assert_output --partial "\"-x\" is required with \"-d\""
+}
+
+@test "the user looks up usage info for deleting excluded files and folders" {
+  run rback -h
+  assert_output --partial "rback [ [ --delete-excluded ] "
+  assert_output --regexp "rback -r [ [ --delete-excluded ] "
+  assert_output --partial "-d, --delete-excluded"
 }
