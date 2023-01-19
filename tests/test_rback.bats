@@ -280,8 +280,8 @@ assert_inodes_not_equal() {
 
 @test "the user looks up the command line option for an exclusion file" {
   run rback -h
-  assert_output --partial "rback [--exclude-file <filename>]"
-  assert_output --partial "rback -r [--exclude-file <filename>]"
+  assert_output --partial "rback [ --exclude-file <filename> ]"
+  assert_output --partial "rback -r [ --exclude-file <filename> ]"
   assert_output --partial "-x, --exclude-file"
 }
 

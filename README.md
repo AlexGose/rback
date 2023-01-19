@@ -6,10 +6,10 @@
 $ src/rback -h
 
 Usage: rback -h
-       rback [--exclude-file <filename>] -- UNIT START INTERVAL LIMIT SRC1 \
+       rback [ --exclude-file <filename> ] -- UNIT START INTERVAL LIMIT SRC1 \
            [ SRC2 [ ... ] ] DEST
-       rback -r [--exclude-file <filename>] -- UNIT1 START1 INTERVAL1 LIMIT1 \
-           UNIT2 START2 INTERVAL2 DEST
+       rback -r [ --exclude-file <filename> ] -- UNIT1 START1 INTERVAL1 \
+           LIMIT1 UNIT2 START2 INTERVAL2 DEST
   OPTIONS
     -h, --help          Display this help message
     -r, --rotate        Rotate snapshots.  Update snapshots without backing up
