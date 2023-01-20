@@ -148,6 +148,8 @@ main() {
   exclude_file=""
   local delete_excluded
   delete_excluded="false"
+  local verbose
+  verbose="false"
 
   while :; do
     case "$1" in
@@ -155,6 +157,7 @@ main() {
       -r|--rotate) rotate_flag="true" ;;
       -x|--exclude-file|--exclude-from) exclude_file="$2"; shift ;;
       -d|--delete-excluded) delete_excluded="true" ;;
+      -v|--verbose) verbose="true" ;;
       --) shift; break ;;
       -*) error "${FUNCNAME[0]}: ${LINENO[0]}: Unknown option \"$1\"" ;;
       *) break ;;
@@ -219,7 +222,7 @@ main() {
   target_dir="${backup_dir}/${time_unit}.$(( start )).${interval}"
 
   local rsync_opts
-  rsync_opts=("--link-dest=${link_dest}" --delete -va)
+  rsync_opts=("--link-dest=${link_dest}" --delete -a)
   local rsync_args
   rsync_args=("${source_dir[@]}" "${target_dir}")
 
@@ -229,7 +232,13 @@ main() {
       rsync_opts+=("--delete-excluded")
     fi
   fi
-  rsync "${rsync_opts[@]}" -- "${rsync_args[@]}"
+  if rsync "${rsync_opts[@]}" -- "${rsync_args[@]}" 2>/dev/null; then
+    if [[ "${verbose}" == "true" ]]; then
+      echo "$(date +"%F %T"): backup completed"
+    fi
+  else
+    error "${FUNCNAME[0]}: ${LINENO[0]}: rsync error"
+  fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then

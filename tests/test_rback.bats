@@ -360,3 +360,13 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
   assert_output --regexp "rback -r [ [ --delete-excluded ] "
   assert_output --partial "-d, --delete-excluded"
 }
+
+@test "the user backs up a directory with a log message to standard out" {
+  mkdir "${TEMP_TEST_DIR}/files"
+  
+  run rback -v -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}"
+
+  assert_success
+  assert_output --partial "backup completed"
+  (( $(date +%s) - $(date -d "${output:0:19}" +%s) < 5 )) # within 5 seconds
+}
