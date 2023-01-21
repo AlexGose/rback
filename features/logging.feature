@@ -30,3 +30,11 @@ Scenario: The user tries to backup a non-existent folder with logging enabled
     And a message is printed to standard error
     And the message contains the phrase "Rsync error"
     And the message contains the current time stamp within a 5 second difference
+
+Scenario: The user passes an invalid argument with logging enabled
+    Given the directory "${TEMP_TEST_DIR}/files" to back up exists
+    When the user executes "rback -v -- hour 2.2 2 6 ${TEMP_TEST_DIR}/files ${TEMP_TEST_DIR}"
+    Then the command fails
+    And a message is printed to standard error
+    And the message contains the phrase "second argument"
+    And the message contains the current time stamp within a 5 second difference

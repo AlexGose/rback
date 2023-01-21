@@ -390,3 +390,13 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
   assert_output --partial "Rsync error"
   (( $(date +%s) - $(date -d "${output:0:19}" +%s) < 5 )) # within 5 second
 }
+
+@test "the user passes an invalid argument with logging enabled" {
+  mkdir "${TEMP_TEST_DIR}/files"
+
+  run rback -v -- hour 2.2 2 6 "${TEMP_TEST_DIR}/files" "${TEMP_TEST_DIR}"
+
+  assert_failure
+  assert_output --partial "second argument"
+  (( $(date +%s) - $(date -d "${output:0:19}" +%s) < 5 )) # within 5 second
+}
