@@ -360,8 +360,8 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
 
 @test "the user looks up usage info for deleting excluded files and folders" {
   run rback -h
-  assert_output --partial "rback [ [ --delete-excluded ] "
-  assert_output --regexp "rback -r [ [ --delete-excluded ] "
+  assert_output --regexp "rback .*[ [ --delete-excluded ] "
+  assert_output --regexp "rback -r .*[ [ --delete-excluded ] "
   assert_output --partial "-d, --delete-excluded"
 }
 
@@ -413,4 +413,12 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
   assert_failure
   assert_output --partial "Unknown option \"-z\""
   assert_current_timestamp
+}
+
+@test "the user looks up the command line option for logging" {
+  run rback -h
+
+  assert_output --partial "rback [ -v ] "
+  assert_output --partial "rback -r [ -v ] "
+  assert_output --partial "-x, --exclude-file"
 }

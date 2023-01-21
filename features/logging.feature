@@ -46,3 +46,9 @@ Scenario: The user passes an unknown option with logging enabled
     And a message is printed to standard error
     And the message contains the phrase 'Unknown option "-z"'
     And the message contains the current time stamp within a 5 second difference
+
+Scenario: The user looks up the command line option for logging
+    When the user enters "rback -h"
+    Then "[ -v ]" is shown in the usage information for "rback"
+    And "[ -v ]" is shown in the usage information for "rback -r"
+    And the options "-v, --verbose" appear as well
