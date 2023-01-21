@@ -155,6 +155,8 @@ main() {
   delete_excluded="false"
   local verbose
   verbose="false"
+  local unknown_option
+  unknown_option=""
 
   while :; do
     case "$1" in
@@ -164,11 +166,17 @@ main() {
       -d|--delete-excluded) delete_excluded="true" ;;
       -v|--verbose) verbose="true" ;;
       --) shift; break ;;
-      -*) error "${FUNCNAME[0]}: ${LINENO[0]}: Unknown option \"$1\"" ;;
+      -*) unknown_option="$1" ;;
       *) break ;;
     esac
     shift
   done
+
+  if [[ -n "${unknown_option}" ]]; then
+    error "${FUNCNAME[0]}: ${LINENO[0]}: Unknown option \"${unknown_option}\"" \
+        "${verbose}"
+  fi
+
 
   if [[ "${delete_excluded}" == "true" ]] && ! [[ -f "${exclude_file}" ]]; then
       error "${FUNCNAME[0]}: ${LINENO[0]}: \"-x\" is required with \"-d\""
