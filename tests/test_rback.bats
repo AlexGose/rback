@@ -47,6 +47,10 @@ assert_inodes_not_equal() {
   [ "$(get_inode "$1")" != "$(get_inode "$2")" ]
 }
 
+assert_current_timestamp() {
+  (( $(date +%s) - $(date -d "${output:0:19}" +%s) < 5 )) # within 5 second
+}
+
 @test "script file exists" {
   assert_file_exists src/rback
 }
@@ -356,7 +360,65 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
 
 @test "the user looks up usage info for deleting excluded files and folders" {
   run rback -h
-  assert_output --partial "rback [ [ --delete-excluded ] "
-  assert_output --regexp "rback -r [ [ --delete-excluded ] "
+  assert_output --regexp "rback .*[ [ --delete-excluded ] "
+  assert_output --regexp "rback -r .*[ [ --delete-excluded ] "
   assert_output --partial "-d, --delete-excluded"
+}
+
+@test "the user backs up a directory with a log message to standard out" {
+  mkdir "${TEMP_TEST_DIR}/files"
+  
+  run rback -v -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}"
+
+  assert_success
+  assert_output --partial "backup completed"
+  assert_current_timestamp
+}
+
+@test "the user rotates snapshots with a log message to standard out" {
+  mkdir "${TEMP_TEST_DIR}/minute.240.30"
+
+  run rback -r -v -- hour 4 4 8 minute 240 30 "${TEMP_TEST_DIR}"
+
+  assert_success
+  assert_output --partial "snapshot rotation completed"
+  assert_current_timestamp
+}
+
+@test "the user tries to backup a non-existent folder with logging enabled" {
+  assert_dir_not_exists "${TEMP_TEST_DIR}/files"
+
+  run rback -v -- hour 4 4 12 "${TEMP_TEST_DIR}/files" "${TEMP_TEST_DIR}"
+
+  assert_failure
+  assert_output --partial "Rsync error"
+  assert_current_timestamp
+}
+
+@test "the user passes an invalid argument with logging enabled" {
+  mkdir "${TEMP_TEST_DIR}/files"
+
+  run rback -v -- hour 2.2 2 6 "${TEMP_TEST_DIR}/files" "${TEMP_TEST_DIR}"
+
+  assert_failure
+  assert_output --partial "second argument"
+  assert_current_timestamp
+}
+
+@test "the user passes an unknown option with logging enabled" {
+  mkdir "${TEMP_TEST_DIR}/files"
+
+  run rback -z -v -- hour 2 2 6 "${TEMP_TEST_DIR}/files" "${TEMP_TEST_DIR}"
+
+  assert_failure
+  assert_output --partial "Unknown option \"-z\""
+  assert_current_timestamp
+}
+
+@test "the user looks up the command line option for logging" {
+  run rback -h
+
+  assert_output --partial "rback [ -v ] "
+  assert_output --partial "rback -r [ -v ] "
+  assert_output --partial "-x, --exclude-file"
 }

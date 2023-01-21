@@ -3,26 +3,32 @@
 # Rsync-based script for backups
 
 error() {
-  echo "ERROR: ${BASH_SOURCE[0]}: $1" >&2
+  local timestamp
+  timestamp=""
+  if (( $# > 1 )) && [[ "$2" == "true" ]]; then
+    timestamp+="$(date +"%F %T"): "
+  fi
+  echo "${timestamp}ERROR: ${BASH_SOURCE[0]}: $1" >&2
   exit 1
 }
 
 assert_positive_int_arg() {
   if ! [[ "$1" =~ ^[1-9][0-9]*$ ]]; then
-    error "$2: $3: $4 argument: $1, but expected a positive integer"
+    error "$2: $3: $4 argument: $1, but expected a positive integer" "$5"
   fi
 }
 
 usage() {
   local usage_string
   usage_string="Usage: rback -h
-       rback [ [ --delete-excluded ] --exclude-file <filename> ] -- UNIT \\
-           START INTERVAL LIMIT SRC1 [ SRC2 [ ... ] ] DEST
-       rback -r [ [ --delete-excluded ] --exclude-file <filename> ] -- UNIT1 \\
-           START1 INTERVAL1 LIMIT1 UNIT2 START2 INTERVAL2 DEST
+       rback [ -v ] [ [ --delete-excluded ] --exclude-file <filename> ] \\
+           -- UNIT START INTERVAL LIMIT SRC1 [ SRC2 [ ... ] ] DEST
+       rback -r [ -v ] [ [ --delete-excluded ] --exclude-file <filename> ] \\
+           -- UNIT1 START1 INTERVAL1 LIMIT1 UNIT2 START2 INTERVAL2 DEST
   OPTIONS
     -h, --help            Display this help message
     -r, --rotate          Rotate snapshots.  Update snapshots without back up
+    -v, --verbose         Enable logging.  Verbose output with timestamps
     -x, --exclude-file    Flag for exclusion file passed to Rsync
     -d, --delete-excluded Flag for deleting excluded backup files and folders
   ARGS
@@ -148,6 +154,10 @@ main() {
   exclude_file=""
   local delete_excluded
   delete_excluded="false"
+  local verbose
+  verbose="false"
+  local unknown_option
+  unknown_option=""
 
   while :; do
     case "$1" in
@@ -155,12 +165,19 @@ main() {
       -r|--rotate) rotate_flag="true" ;;
       -x|--exclude-file|--exclude-from) exclude_file="$2"; shift ;;
       -d|--delete-excluded) delete_excluded="true" ;;
+      -v|--verbose) verbose="true" ;;
       --) shift; break ;;
-      -*) error "${FUNCNAME[0]}: ${LINENO[0]}: Unknown option \"$1\"" ;;
+      -*) unknown_option="$1" ;;
       *) break ;;
     esac
     shift
   done
+
+  if [[ -n "${unknown_option}" ]]; then
+    error "${FUNCNAME[0]}: ${LINENO[0]}: Unknown option \"${unknown_option}\"" \
+        "${verbose}"
+  fi
+
 
   if [[ "${delete_excluded}" == "true" ]] && ! [[ -f "${exclude_file}" ]]; then
       error "${FUNCNAME[0]}: ${LINENO[0]}: \"-x\" is required with \"-d\""
@@ -179,17 +196,20 @@ main() {
   time_unit="$1"
   shift
   
-  assert_positive_int_arg "$1" "${FUNCNAME[0]}" "${LINENO[0]}" "second"
+  assert_positive_int_arg "$1" "${FUNCNAME[0]}" "${LINENO[0]}" "second" \
+      "${verbose}"
   local start
   start="$1"
   shift
   
-  assert_positive_int_arg "$1" "${FUNCNAME[0]}" "${LINENO[0]}" "third"
+  assert_positive_int_arg "$1" "${FUNCNAME[0]}" "${LINENO[0]}" "third" \
+      "${verbose}"
   local interval
   interval="$1"
   shift
   
-  assert_positive_int_arg "$1" "${FUNCNAME[0]}" "${LINENO[0]}" "fourth"
+  assert_positive_int_arg "$1" "${FUNCNAME[0]}" "${LINENO[0]}" "fourth" \
+      "${verbose}"
   local limit
   limit="$1"
   shift
@@ -209,8 +229,10 @@ main() {
     link_dest="${backup_dir}/${time_unit}.$(( start + interval )).${interval}"
   else
     backup_dir="$4"
-    assert_positive_int_arg "$2" "${FUNCNAME[0]}" "${LINENO[0]}" "sixth"
-    assert_positive_int_arg "$3" "${FUNCNAME[0]}" "${LINENO[0]}" "seventh"
+    assert_positive_int_arg "$2" "${FUNCNAME[0]}" "${LINENO[0]}" "sixth" \
+        "${verbose}"
+    assert_positive_int_arg "$3" "${FUNCNAME[0]}" "${LINENO[0]}" "seventh" \
+        "${verbose}"
     source_dir=("${backup_dir}/$1.$2.$3/")
     link_dest="${source_dir[0]}"
   fi
@@ -219,7 +241,7 @@ main() {
   target_dir="${backup_dir}/${time_unit}.$(( start )).${interval}"
 
   local rsync_opts
-  rsync_opts=("--link-dest=${link_dest}" --delete -va)
+  rsync_opts=("--link-dest=${link_dest}" --delete -a)
   local rsync_args
   rsync_args=("${source_dir[@]}" "${target_dir}")
 
@@ -229,7 +251,17 @@ main() {
       rsync_opts+=("--delete-excluded")
     fi
   fi
-  rsync "${rsync_opts[@]}" -- "${rsync_args[@]}"
+  if rsync "${rsync_opts[@]}" -- "${rsync_args[@]}" 2>/dev/null; then
+    if [[ "${verbose}" == "true" ]]; then
+      if [[ "${rotate_flag}" == "true" ]]; then
+        echo "$(date +"%F %T"): snapshot rotation completed"
+      else
+        echo "$(date +"%F %T"): backup completed"
+      fi
+    fi
+  else
+      error "${FUNCNAME[0]}: ${LINENO[0]}: Rsync error" "${verbose}"
+  fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then

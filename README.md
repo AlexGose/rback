@@ -6,13 +6,14 @@
 $ src/rback -h
 
 Usage: rback -h
-       rback [ [ --delete-excluded ] --exclude-file <filename> ] -- UNIT \
-           START INTERVAL LIMIT SRC1 [ SRC2 [ ... ] ] DEST
-       rback -r [ [ --delete-excluded ] --exclude-file <filename> ] -- UNIT1 \
-           START1 INTERVAL1 LIMIT1 UNIT2 START2 INTERVAL2 DEST
+       rback [ -v ] [ [ --delete-excluded ] --exclude-file <filename> ] \
+           -- UNIT START INTERVAL LIMIT SRC1 [ SRC2 [ ... ] ] DEST
+       rback -r [ -v ] [ [ --delete-excluded ] --exclude-file <filename> ] \
+           -- UNIT1 START1 INTERVAL1 LIMIT1 UNIT2 START2 INTERVAL2 DEST
   OPTIONS
     -h, --help            Display this help message
     -r, --rotate          Rotate snapshots.  Update snapshots without back up
+    -v, --verbose         Enable logging.  Verbose output with timestamps
     -x, --exclude-file    Flag for exclusion file passed to Rsync
     -d, --delete-excluded Flag for deleting excluded backup files and folders
   ARGS
