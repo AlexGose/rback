@@ -22,3 +22,11 @@ Scenario: The user rotates snapshots with a log message to standard out
     And a message is printed to standard out
     And the message contains the phrase "snapshot rotation completed"
     And the message contains the current timestamp within a 5 second difference
+
+Scenario: The user tries to backup a non-existent folder with logging enabled
+    Given the directory to back up "${TEMP_TEST_DIR}/files/" does not exist
+    When the user executes "rback -v -- hour 4 4 12 ${TEMP_TEST_DIR}/files/ ${TEMP_TEST_DIR}"
+    Then the command fails
+    And a message is printed to standard error
+    And the message contains the phrase "Rsync error"
+    And the message contains the current time stamp within a 5 second difference

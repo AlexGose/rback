@@ -3,7 +3,12 @@
 # Rsync-based script for backups
 
 error() {
-  echo "ERROR: ${BASH_SOURCE[0]}: $1" >&2
+  local timestamp
+  timestamp=""
+  if (( $# > 1 )) && [[ "$2" == "true" ]]; then
+    timestamp+="$(date +"%F %T"): "
+  fi
+  echo "${timestamp}ERROR: ${BASH_SOURCE[0]}: $1" >&2
   exit 1
 }
 
@@ -241,7 +246,7 @@ main() {
       fi
     fi
   else
-    error "${FUNCNAME[0]}: ${LINENO[0]}: rsync error"
+      error "${FUNCNAME[0]}: ${LINENO[0]}: Rsync error" "${verbose}"
   fi
 }
 

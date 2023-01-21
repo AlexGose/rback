@@ -380,3 +380,13 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
   assert_output --partial "snapshot rotation completed"
   (( $(date +%s) - $(date -d "${output:0:19}" +%s) < 5 )) # within 5 second
 }
+
+@test "the user tries to backup a non-existent folder with logging enabled" {
+  assert_dir_not_exists "${TEMP_TEST_DIR}/files"
+
+  run rback -v -- hour 4 4 12 "${TEMP_TEST_DIR}/files" "${TEMP_TEST_DIR}"
+
+  assert_failure
+  assert_output --partial "Rsync error"
+  (( $(date +%s) - $(date -d "${output:0:19}" +%s) < 5 )) # within 5 second
+}
