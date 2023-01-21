@@ -234,7 +234,11 @@ main() {
   fi
   if rsync "${rsync_opts[@]}" -- "${rsync_args[@]}" 2>/dev/null; then
     if [[ "${verbose}" == "true" ]]; then
-      echo "$(date +"%F %T"): backup completed"
+      if [[ "${rotate_flag}" == "true" ]]; then
+        echo "$(date +"%F %T"): snapshot rotation completed"
+      else
+        echo "$(date +"%F %T"): backup completed"
+      fi
     fi
   else
     error "${FUNCNAME[0]}: ${LINENO[0]}: rsync error"

@@ -370,3 +370,13 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
   assert_output --partial "backup completed"
   (( $(date +%s) - $(date -d "${output:0:19}" +%s) < 5 )) # within 5 seconds
 }
+
+@test "the user rotates snapshots with a log message to standard out" {
+  mkdir "${TEMP_TEST_DIR}/minute.240.30"
+
+  run rback -r -v -- hour 4 4 8 minute 240 30 "${TEMP_TEST_DIR}"
+
+  assert_success
+  assert_output --partial "snapshot rotation completed"
+  (( $(date +%s) - $(date -d "${output:0:19}" +%s) < 5 )) # within 5 second
+}
