@@ -47,6 +47,10 @@ assert_inodes_not_equal() {
   [ "$(get_inode "$1")" != "$(get_inode "$2")" ]
 }
 
+assert_current_timestamp() {
+  (( $(date +%s) - $(date -d "${output:0:19}" +%s) < 5 )) # within 5 second
+}
+
 @test "script file exists" {
   assert_file_exists src/rback
 }
@@ -368,7 +372,7 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
 
   assert_success
   assert_output --partial "backup completed"
-  (( $(date +%s) - $(date -d "${output:0:19}" +%s) < 5 )) # within 5 seconds
+  assert_current_timestamp
 }
 
 @test "the user rotates snapshots with a log message to standard out" {
@@ -378,7 +382,7 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
 
   assert_success
   assert_output --partial "snapshot rotation completed"
-  (( $(date +%s) - $(date -d "${output:0:19}" +%s) < 5 )) # within 5 second
+  assert_current_timestamp
 }
 
 @test "the user tries to backup a non-existent folder with logging enabled" {
@@ -388,7 +392,7 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
 
   assert_failure
   assert_output --partial "Rsync error"
-  (( $(date +%s) - $(date -d "${output:0:19}" +%s) < 5 )) # within 5 second
+  assert_current_timestamp
 }
 
 @test "the user passes an invalid argument with logging enabled" {
@@ -398,7 +402,7 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
 
   assert_failure
   assert_output --partial "second argument"
-  (( $(date +%s) - $(date -d "${output:0:19}" +%s) < 5 )) # within 5 second
+  assert_current_timestamp
 }
 
 @test "the user passes an unknown option with logging enabled" {
@@ -408,5 +412,5 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
 
   assert_failure
   assert_output --partial "Unknown option \"-z\""
-  (( $(date +%s) - $(date -d "${output:0:19}" +%s) < 5 )) # within 5 second
+  assert_current_timestamp
 }
