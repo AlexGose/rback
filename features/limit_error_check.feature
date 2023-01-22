@@ -13,3 +13,10 @@ Scenario: The user enters a limit argument less than the start argument
     Then the command fails
     And a message is printed to standard error
     And the error message contains the phrase "START 2 exceeds LIMIT 1"
+
+Scenario: The user enters a limit less than the start with "-r"
+    Given the directory "${TEMP_TEST_DIR}/minute.120.30" exists
+    When the user executes "rback -r -- hour 2 2 1 minute 120 30  ${TEMP_TEST_DIR}"
+    Then the command fails
+    And a message is printed to standard error
+    And the error message contains the phrase "START 2 exceeds LIMIT 1"
