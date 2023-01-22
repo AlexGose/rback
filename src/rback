@@ -213,7 +213,13 @@ main() {
   local limit
   limit="$1"
   shift
-  
+
+  if (( start > limit )); then
+    local error_prefix
+    error_prefix="${FUNCNAME[0]}: ${LINENO[0]}:"
+    error "${error_prefix} START ${start} exceeds LIMIT ${limit}" "${verbose}"
+  fi
+
   local backup_dir
   local source_dir
   local link_dest

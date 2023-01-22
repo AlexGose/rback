@@ -422,3 +422,12 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
   assert_output --partial "rback -r [ -v ] "
   assert_output --partial "-x, --exclude-file"
 }
+
+@test "the user enters a limit argument less than the start argument" {
+  mkdir "${TEMP_TEST_DIR}/files"
+
+  run rback -- hour 2 2 1 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}"
+
+  assert_failure
+  assert_output --partial "START 2 exceeds LIMIT 1"
+}
