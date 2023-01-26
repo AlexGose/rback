@@ -304,7 +304,7 @@ assert_current_timestamp() {
   assert_file_exists "${TEMP_TEST_DIR}/hour.4.4/exclude_me.txt"
 }
 
-@test "The user backs up a file and deletes an excluded file in backup" {
+@test "the user backs up a file and deletes an excluded file in backup" {
   mkdir "${TEMP_TEST_DIR}/files"
   touch "${TEMP_TEST_DIR}/files/my_file.txt"
   echo "- exclude_me.txt" > "${TEMP_TEST_DIR}/excludes"
@@ -319,7 +319,7 @@ assert_current_timestamp() {
   assert_file_not_exists "${TEMP_TEST_DIR}/hour.4.4/exclude_me.txt"
 }
 
-@test "The user backs up a file without deleting a non-empty backup directory" {
+@test "the user backs up a file without deleting a non-empty backup directory" {
   mkdir "${TEMP_TEST_DIR}/files"
   touch "${TEMP_TEST_DIR}/files/my_file.txt"
   echo "- do_not_delete" > "${TEMP_TEST_DIR}/excludes"
@@ -335,7 +335,7 @@ assert_current_timestamp() {
   assert_file_exists "${TEMP_TEST_DIR}/hour.4.4/do_not_delete/hello.txt"
 }
 
-@test "The user backs up a file and deletes a non-empty backup directory" {
+@test "the user backs up a file and deletes a non-empty backup directory" {
   mkdir "${TEMP_TEST_DIR}/files"
   touch "${TEMP_TEST_DIR}/files/my_file.txt"
   echo "- delete_me" > "${TEMP_TEST_DIR}/excludes"
@@ -350,7 +350,7 @@ assert_current_timestamp() {
   assert_dir_not_exists "${TEMP_TEST_DIR}/hour.4.4/delete_me"
 }
 
-@test "The user forgets the \"-x\" option when using \"--delete-excluded\"" {
+@test "the user forgets the \"-x\" option when using \"--delete-excluded\"" {
   mkdir "${TEMP_TEST_DIR}/files"
   touch "${TEMP_TEST_DIR}/files/my_file.txt"
 run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}"
