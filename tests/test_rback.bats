@@ -431,3 +431,10 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
   assert_failure
   assert_output --partial "START 2 exceeds LIMIT 1"
 }
+
+@test "the user passes fewer than 6 arguments with \"-v\"" {
+  run rback -v -- minute 30 30 480 "${TEMP_TEST_DIR}"
+  assert_failure
+  assert_output --partial "at least 6 required"
+  assert_current_timestamp
+}

@@ -19,6 +19,9 @@ assert_positive_int_arg() {
 }
 
 usage() {
+  if [[ "$1" == "true" ]]; then
+      echo "$(date +"%F %T"): INFO:"
+  fi
   local usage_string
   usage_string="Usage: rback -h
        rback [ -v ] [ [ --delete-excluded ] --exclude-file <filename> ] \\
@@ -158,6 +161,8 @@ main() {
   verbose="false"
   local unknown_option
   unknown_option=""
+  local error_prefix
+  error_prefix=""
 
   while :; do
     case "$1" in
@@ -184,8 +189,9 @@ main() {
   fi
 
   if (( $# < 6  )); then
-    usage
-    error "${FUNCNAME[0]}: ${LINENO[0]}: $# arguments, but at least 6 required"
+    usage "${verbose}"
+    error_prefix="${FUNCNAME[0]}: ${LINENO[0]}:"
+    error "${error_prefix}: $# arguments, but at least 6 required" "${verbose}"
   fi
   if [[ "${rotate_flag}" == "true" ]] && (( $# != 8 )); then
     usage
@@ -215,7 +221,6 @@ main() {
   shift
 
   if (( start > limit )); then
-    local error_prefix
     error_prefix="${FUNCNAME[0]}: ${LINENO[0]}:"
     error "${error_prefix} START ${start} exceeds LIMIT ${limit}" "${verbose}"
   fi
