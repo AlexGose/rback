@@ -28,3 +28,12 @@ Scenario: The user passes "-d" and "-v" without "-x"
     And a message is printed to standard error
     And the message contains '"-x" is required with "-d"'
     And the message contains the current timestamp within a 5 second difference
+
+Scenario: The user passes "-v" with an existing directory conflict
+    Given the directory "${TEMP_TEST_DIR}/hour.6.2" exists
+    And the directory "${TEMP_TEST_DIR}/minute.120.30" exists
+    When the user executes "rback -r -v -- hour 2 2 4 minute 120 30 ${TEMP_TEST_DIR}"
+    Then the command fails
+    And a message is printed to standard error
+    And the message contains "${TEMP_TEST_DIR}/hour.6.2 already exists"
+    And the message contains the current timestamp within a 5 second difference

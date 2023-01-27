@@ -56,13 +56,14 @@ usage() {
 # an empty snapshot folder corresponding to <start> <time unit>s will be
 # created.
 #
-# Usage: rotate <backup dir> <time unit> <start> <interval> <limit>
+# Usage: rotate <backup dir> <time unit> <start> <interval> <limit> [<verbose>]
 #
 # Inputs: <backup dir> - path to the directory containing all snapshot folders
 #         <time unit> - unit of time ("minute","hour","day",etc.)
 #         <start> - integer elapsed start time, time of the first snapshot
 #         <interval> - integer interval of elapsed time, time between snapshots
 #         <limit> - integer limit of elapsed time, time limit of snapshots
+#         <verbose> - (optional) if "true", then print verbose output
 #
 # In the backup directory, a snapshot folder for <limit> + <interval> elapsed
 # time will be created temporarily if it does not already exist; otherwise,
@@ -79,13 +80,16 @@ rotate() {
   interval=$4
   local limit
   limit=$5
+  local verbose
+  verbose=$6
 
   local temp_folder # temporary snapshot folder name
   temp_folder="${backup_dir}/${time_unit}.$(( limit + interval ))"
   temp_folder+=".$(( interval ))"
 
   if [[ -d "${temp_folder}" ]]; then
-    error "${FUNCNAME[0]}: ${LINENO[0]}: ${temp_folder} already exists"
+    error "${FUNCNAME[0]}: ${LINENO[0]}: ${temp_folder} already exists" \
+        "${verbose}"
   fi
 
   for (( n = limit; n >= start; n -= interval )); do
@@ -250,7 +254,8 @@ main() {
     link_dest="${source_dir[0]}"
   fi
   
-  rotate "${backup_dir}" "${time_unit}" "${start}" "${interval}" "${limit}"
+  rotate "${backup_dir}" "${time_unit}" "${start}" "${interval}" "${limit}" \
+      "${verbose}"
   target_dir="${backup_dir}/${time_unit}.$(( start )).${interval}"
 
   local rsync_opts
