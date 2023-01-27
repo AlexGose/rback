@@ -431,3 +431,41 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
   assert_failure
   assert_output --partial "START 2 exceeds LIMIT 1"
 }
+
+@test "the user passes fewer than 6 arguments with \"-v\"" {
+  run rback -v -- minute 30 30 480 "${TEMP_TEST_DIR}"
+
+  assert_failure
+  assert_output --partial "at least 6 required"
+  assert_current_timestamp
+}
+
+@test "the user passes the wrong number of arguments with \"-r\" and \"-v\"" {
+  run rback -r -v -- minute 10 120 10 hour 2 2
+
+  assert_failure
+  assert_output --partial "expected 8"
+  assert_current_timestamp
+}
+
+@test "the user passes \"-d\" and \"-v\" without \"-x\"" {
+  mkdir "${TEMP_TEST_DIR}/files"
+
+  run rback --delete-excluded -v -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" \
+      "${TEMP_TEST_DIR}"
+
+  assert_failure
+  assert_output --partial "\"-x\" is required with \"-d\""
+  assert_current_timestamp
+}
+
+@test "the user passes \"-v\" with existing directory conflict" {
+  assert_dir_exists "${TEMP_TEST_DIR}/hour.6.2"
+  mkdir "${TEMP_TEST_DIR}/minute.120.30"
+
+  run rback -r -v -- hour 2 2 4 minute 120 30 "${TEMP_TEST_DIR}"
+
+  assert_failure
+  assert_output --partial "${TEMP_TEST_DIR}/hour.6.2 already exists"
+  assert_current_timestamp
+}
