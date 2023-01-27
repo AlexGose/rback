@@ -438,3 +438,10 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
   assert_output --partial "at least 6 required"
   assert_current_timestamp
 }
+
+@test "the user passes the wrong number of arguments with \"-r\" and \"-v\"" {
+  run rback -r -v -- minute 10 120 10 hour 2 2
+  assert_failure
+  assert_output --partial "expected 8"
+  assert_current_timestamp
+}

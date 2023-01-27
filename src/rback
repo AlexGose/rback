@@ -194,8 +194,9 @@ main() {
     error "${error_prefix}: $# arguments, but at least 6 required" "${verbose}"
   fi
   if [[ "${rotate_flag}" == "true" ]] && (( $# != 8 )); then
-    usage
-    error "${FUNCNAME[0]}: ${LINENO[0]}: $# arguments, but expected 8"
+    usage "${verbose}"
+    error "${FUNCNAME[0]}: ${LINENO[0]}: $# arguments, but expected 8" \
+        "${verbose}"
   fi
 
   local time_unit
