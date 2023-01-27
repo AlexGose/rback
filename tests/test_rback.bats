@@ -445,3 +445,12 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
   assert_output --partial "expected 8"
   assert_current_timestamp
 }
+
+@test "the user passes \"-d\" and \"-v\" without \"-x\"" {
+  mkdir "${TEMP_TEST_DIR}/files"
+  run rback --delete-excluded -v -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" \
+      "${TEMP_TEST_DIR}"
+  assert_failure
+  assert_output --partial "\"-x\" is required with \"-d\""
+  assert_current_timestamp
+}

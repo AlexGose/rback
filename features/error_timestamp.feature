@@ -20,3 +20,11 @@ Scenario: The user passes the wrong number of arguments with "-r" and "-v"
     And a message is printed to standard error
     And the message contains the phrase "expected 8"
     And the message contains the current timestamp within a 5 second difference
+
+Scenario: The user passes "-d" and "-v" without "-x"
+    Given the directory "${TEMP_TEST_DIR}/files" exists
+    When the user executes "rback -v -d -- hour 4 4 12 ${TEMP_TEST_DIR}/files/ ${TEMP_TEST_DIR}"
+    Then the command fails
+    And a message is printed to standard error
+    And the message contains '"-x" is required with "-d"'
+    And the message contains the current timestamp within a 5 second difference
