@@ -469,3 +469,15 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
   assert_output --partial "${TEMP_TEST_DIR}/hour.6.2 already exists"
   assert_current_timestamp
 }
+
+@test "the user copies a snapshot, appends \"hello\", and rotates snapshots" {
+  mkdir "${TEMP_TEST_DIR}/minute.120.30"
+  cp -r "${TEMP_TEST_DIR}/minute.120.30" "${TEMP_TEST_DIR}/minute.120.30_hello"
+
+  run rback --rotate -- hour 2 2 6 minute 120 30 "${TEMP_TEST_DIR}"
+
+  assert_failure
+  assert_output --partial "conflicting snapshot names"
+  assert_output --partial "${TEMP_TEST_DIR}/minute.120.30"
+  assert_output --partial "${TEMP_TEST_DIR}/minute.120.30_hello"
+}

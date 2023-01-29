@@ -2,6 +2,8 @@
 #
 # Rsync-based script for backups
 
+set -e
+
 error() {
   local timestamp
   timestamp=""
@@ -84,6 +86,7 @@ rotate() {
   verbose=$6
 
   local temp_folder # temporary snapshot folder name
+  # TO DO: call snapshot_dir_name:
   temp_folder="${backup_dir}/${time_unit}.$(( limit + interval ))"
   temp_folder+=".$(( interval ))"
 
@@ -129,23 +132,76 @@ update() {
   local interval
   interval=$4
   local snapshot_to_update
+  # TO DO: call snapshot_dir_name:
   snapshot_to_update=${snapshot_prefix}$(( elapsed_time )).$(( interval ))
 
   if (( $# == 4 )); then
     if [[ -d "${snapshot_to_update}" ]]; then
+      # TO DO: call snapshot_dir_name:
       mv -- "${snapshot_to_update}" \
           "${snapshot_prefix}$(( elapsed_time + interval )).$(( interval ))"
     fi
   elif (( $# == 5 )); then
     if [[ -d "${snapshot_to_update}" ]]; then
+      # TO DO: call snapshot_dir_name:
       mv -- "${snapshot_to_update}" "${snapshot_prefix}$5.$(( interval ))"
     else
+      # TO DO: call snapshot_dir_name:
       mkdir "${snapshot_prefix}$5.$(( interval ))"
     fi
   else
     local error_prefix
     error_prefix="${FUNCNAME[0]}: ${LINENO[0]}:"
     error "${error_prefix} $# arguments were passed, but expected 4 or 5."
+  fi
+}
+
+# Print the unique snapshot directory name based on the input arguments
+#
+# Usage: snapshot_dir_name <backup dir> <time unit> <elapsed time> <interval> \
+#           [ <verbose> ]
+#
+# Inputs:
+#    <backup dir> - path to the directory containing all the snapshot folders
+#    <time unit> - unit of time ("minute","hour","day",etc.)
+#    <elapsed time> - integer elapsed time for the snapshot
+#    <interval> - integer interval of elapsed time
+#    <verbose> - (optional) if "true", then print verbose output for errors
+#
+# This function prints the unique name of the snapshot folder made after
+# <elapsed time> <time unit>s of time with the snapshot made every <interval>
+# <time unit>s if the snapshot folder already exists.  The format of the
+# snapshot folder name is "<unit>.<elapsed time>.<interval>" with any appended
+# information ignored.  If there is more than one folder name corresponding to
+# the snapshot, then an error will occur.  If no snapshot folder exists, then
+# the name with nothing appended will be returned.
+snapshot_dir_name() {
+  local backup_dir
+  backup_dir=$1
+  local dir_prefix
+  dir_prefix="$2.$3.$4"
+  local verbose
+  verbose=$5
+
+  local entries
+  readarray -t entries < <(ls -N -1 -- "${backup_dir}")
+  local snapshot_names
+  snapshot_names=()
+  for entry in "${entries[@]}"; do
+    if [[ "${entry}" =~ ^${dir_prefix}.* ]] \
+        && [[ -d "${backup_dir}/${entry}" ]]; then
+      snapshot_names+=("${backup_dir}/${entry}")
+    fi
+  done
+
+  if (( ${#snapshot_names[@]} == 0 )); then
+    echo "${backup_dir}/${dir_prefix}"
+  elif (( ${#snapshot_names[@]} == 1 )); then
+    echo "${snapshot_names[0]}"
+  else
+    local error_prefix="${FUNCNAME[0]}: ${LINENO[0]}: "
+    error "${error_prefix}conflicting snapshot names: ${snapshot_names[*]}" \
+        "${verbose}"
   fi
 }
 
@@ -243,6 +299,7 @@ main() {
       shift
     done
     backup_dir="$1"
+    # TO DO: call snapshot_dir_name:
     link_dest="${backup_dir}/${time_unit}.$(( start + interval )).${interval}"
   else
     backup_dir="$4"
@@ -250,12 +307,16 @@ main() {
         "${verbose}"
     assert_positive_int_arg "$3" "${FUNCNAME[0]}" "${LINENO[0]}" "seventh" \
         "${verbose}"
-    source_dir=("${backup_dir}/$1.$2.$3/")
+    # for error propagation, do not substitute expression for snap_dir
+    local snap_dir
+    snap_dir="$(snapshot_dir_name "${backup_dir}" "$1" "$2" "$3" "${verbose}")"
+    source_dir=("${snap_dir}/")
     link_dest="${source_dir[0]}"
   fi
   
   rotate "${backup_dir}" "${time_unit}" "${start}" "${interval}" "${limit}" \
       "${verbose}"
+  # TO DO: call snapshot_dir_name:
   target_dir="${backup_dir}/${time_unit}.$(( start )).${interval}"
 
   local rsync_opts
