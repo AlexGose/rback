@@ -472,12 +472,25 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
 
 @test "the user copies a snapshot, appends \"hello\", and rotates snapshots" {
   mkdir "${TEMP_TEST_DIR}/minute.120.30"
+  
   cp -r "${TEMP_TEST_DIR}/minute.120.30" "${TEMP_TEST_DIR}/minute.120.30_hello"
-
   run rback --rotate -- hour 2 2 6 minute 120 30 "${TEMP_TEST_DIR}"
 
   assert_failure
   assert_output --partial "conflicting snapshot names"
   assert_output --partial "${TEMP_TEST_DIR}/minute.120.30"
   assert_output --partial "${TEMP_TEST_DIR}/minute.120.30_hello"
+}
+
+@test "the user copies a snapshot, appends \"hello\", and backs up" {
+  assert_dir_exists "${TEMP_TEST_DIR}/hour.2.2"
+  mkdir "${TEMP_TEST_DIR}/files"
+
+  cp -r "${TEMP_TEST_DIR}/hour.2.2" "${TEMP_TEST_DIR}/hour.2.2_hello"
+  run rback -- hour 2 2 6 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}"
+
+  assert_failure
+  assert_output --partial "conflicting snapshot names"
+  assert_output --partial "${TEMP_TEST_DIR}/hour.2.2"
+  assert_output --partial "${TEMP_TEST_DIR}/hour.2.2_hello"
 }

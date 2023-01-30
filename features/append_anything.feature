@@ -17,3 +17,15 @@ Scenario: The user copies a snapshot, appends "hello", and rotates snapshots
     And the message contains the phrase "conflicting snapshot names"
     And the message contains "${TEMP_TEST_DIR}/minute.120.30"
     And the message contains "${TEMP_TEST_DIR}/minute.120.30_hello"
+
+Scenario: The user copies a snapshot, appends "hello", and backs up
+    Given the directory "${TEMP_TEST_DIR}/hour.2.2" exists
+    And the directory "${TEMP_TEST_DIR}/files" exists
+    When the user copies the directory "${TEMP_TEST_DIR}/hour.2.2"
+    And the user renames the copy "${TEMP_TEST_DIR}hour.2.2_hello"
+    And the user executes "rback -- hour 2 2 6 ${TEMP_TEST_DIR}/files/ ${TEMP_TEST_DIR}"
+    Then the command fails
+    And a message is printed to standard error
+    And the message contains the phrase "conflicting snapshot names"
+    And the message contains "${TEMP_TEST_DIR}/hour.2.2"
+    And the message contains "${TEMP_TEST_DIR}/hour.2.2_hello"

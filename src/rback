@@ -299,8 +299,8 @@ main() {
       shift
     done
     backup_dir="$1"
-    # TO DO: call snapshot_dir_name:
-    link_dest="${backup_dir}/${time_unit}.$(( start + interval )).${interval}"
+    link_dest="$(snapshot_dir_name "${backup_dir}" "${time_unit}" \
+        "$(( start + interval ))" "${interval}" "${verbose}")"
   else
     backup_dir="$4"
     assert_positive_int_arg "$2" "${FUNCNAME[0]}" "${LINENO[0]}" "sixth" \
@@ -313,11 +313,11 @@ main() {
     source_dir=("${snap_dir}/")
     link_dest="${source_dir[0]}"
   fi
-  
+
   rotate "${backup_dir}" "${time_unit}" "${start}" "${interval}" "${limit}" \
       "${verbose}"
-  # TO DO: call snapshot_dir_name:
-  target_dir="${backup_dir}/${time_unit}.$(( start )).${interval}"
+  target_dir="$(snapshot_dir_name "${backup_dir}" "${time_unit}" \
+      "$(( start ))" "${interval}" "${verbose}")"
 
   local rsync_opts
   rsync_opts=("--link-dest=${link_dest}" --delete -a)
