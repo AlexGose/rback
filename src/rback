@@ -182,14 +182,12 @@ snapshot_dir_name() {
   local verbose
   verbose=$5
 
-  local entries
-  readarray -t entries < <(ls -N -1 -- "${backup_dir}")
   local snapshot_names
   snapshot_names=()
-  for entry in "${entries[@]}"; do
-    if [[ "${entry}" =~ ^${dir_prefix}.* ]] \
-        && [[ -d "${backup_dir}/${entry}" ]]; then
-      snapshot_names+=("${backup_dir}/${entry}")
+  for entry in "${backup_dir}"/*; do
+    if [[ "${entry}" =~ ^${backup_dir}/${dir_prefix}.* ]] \
+        && [[ -d "${entry}" ]]; then
+      snapshot_names+=("${entry}")
     fi
   done
 
