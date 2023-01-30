@@ -86,9 +86,8 @@ rotate() {
   verbose=$6
 
   local temp_folder # temporary snapshot folder name
-  # TO DO: call snapshot_dir_name:
-  temp_folder="${backup_dir}/${time_unit}.$(( limit + interval ))"
-  temp_folder+=".$(( interval ))"
+  temp_folder="$(snapshot_dir_name "${backup_dir}" "${time_unit}" \
+      "$(( limit + interval ))" "${interval}" "${verbose}")"
 
   if [[ -d "${temp_folder}" ]]; then
     error "${FUNCNAME[0]}: ${LINENO[0]}: ${temp_folder} already exists" \

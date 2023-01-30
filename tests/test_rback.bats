@@ -494,3 +494,13 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
   assert_output --partial "${TEMP_TEST_DIR}/hour.2.2"
   assert_output --partial "${TEMP_TEST_DIR}/hour.2.2_hello"
 }
+
+@test "the user backs up after appending \"hello\" to limit+interval snapshot" {
+  mkdir "${TEMP_TEST_DIR}/files"
+
+  mkdir "${TEMP_TEST_DIR}/hour.8.2_hello"
+  run rback -- hour 2 2 6 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}"
+
+  assert_failure
+  assert_output --partial "${TEMP_TEST_DIR}/hour.8.2_hello already exists"
+}
