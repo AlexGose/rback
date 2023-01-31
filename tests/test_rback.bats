@@ -518,3 +518,17 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
   assert_dir_not_exists "${TEMP_TEST_DIR}/hour.6.2_hello"
   assert_dir_not_exists "${TEMP_TEST_DIR}/hour.2.2_hello"
 }
+
+@test "the user appends \"hello\" to a snapshot and backs up" {
+  assert_dir_exists "${TEMP_TEST_DIR}/hour.6.2"
+  mkdir "${TEMP_TEST_DIR}/files"
+
+  mv -- "${TEMP_TEST_DIR}/hour.6.2" "${TEMP_TEST_DIR}/hour.6.2_hello"
+  run rback -- hour 2 2 6 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}"
+
+  assert_success
+  assert_dir_exists "${TEMP_TEST_DIR}/hour.6.2"
+  assert_dir_exists "${TEMP_TEST_DIR}/hour.2.2"
+  assert_dir_not_exists "${TEMP_TEST_DIR}/hour.6.2_hello"
+  assert_dir_not_exists "${TEMP_TEST_DIR}/hour.2.2_hello"
+}

@@ -48,3 +48,14 @@ Scenario: The user appends "hello" to a snapshot and rotates snapshots
     And the directory "${TEMP_TEST_DIR}/hour.2.2" exists
     And the directory "${TEMP_TEST_DIR}/hour.6.2_hello" does not exist
     And the directory "${TEMP_TEST_DIR}/hour.2.2_hello" does not exist
+
+Scenario: The user appends "hello" to a snapshot and backs up
+    Given the directory "${TEMP_TEST_DIR}/hour.6.2 exists
+    And the directory "${TEMP_TEST_DIR}/files" exists
+    When the user renames the directory "${TEMP_TEST_DIR}/hour.6.2" to "${TEMP_TEST_DIR}/hour.6.2_hello"
+    And executes "rback -- hour 2 2 6 ${TEMP_TEST_DIR}/files/ ${TEMP_TEST_DIR}"
+    Then the command succeeds
+    And the directory "${TEMP_TEST_DIR}/hour.6.2" exists
+    And the directory "${TEMP_TEST_DIR}/hour.2.2" exists
+    And the directory "${TEMP_TEST_DIR}/hour.6.2_hello" does not exist
+    And the directory "${TEMP_TEST_DIR}/hour.2.2_hello" does not exist
