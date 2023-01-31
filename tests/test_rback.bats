@@ -504,3 +504,17 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
   assert_failure
   assert_output --partial "${TEMP_TEST_DIR}/hour.8.2_hello already exists"
 }
+
+@test "the user appends \"hello\" to a snapshot and rotates snapshots" {
+  assert_dir_exists "${TEMP_TEST_DIR}/hour.6.2"
+  mkdir "${TEMP_TEST_DIR}/minute.120.30"
+
+  mv -- "${TEMP_TEST_DIR}/hour.6.2" "${TEMP_TEST_DIR}/hour.6.2_hello"
+  run rback -r -- hour 2 2 6 minute 120 30 "${TEMP_TEST_DIR}"
+
+  assert_success
+  assert_dir_exists "${TEMP_TEST_DIR}/hour.6.2"
+  assert_dir_exists "${TEMP_TEST_DIR}/hour.2.2"
+  assert_dir_not_exists "${TEMP_TEST_DIR}/hour.6.2_hello"
+  assert_dir_not_exists "${TEMP_TEST_DIR}/hour.2.2_hello"
+}

@@ -131,21 +131,17 @@ update() {
   local interval
   interval=$4
   local snapshot_to_update
-  # TO DO: call snapshot_dir_name:
-  snapshot_to_update=${snapshot_prefix}$(( elapsed_time )).$(( interval ))
+  snapshot_to_update="$(snapshot_dir_name "$1" "$2" "$3" "$4")"
 
   if (( $# == 4 )); then
     if [[ -d "${snapshot_to_update}" ]]; then
-      # TO DO: call snapshot_dir_name:
       mv -- "${snapshot_to_update}" \
           "${snapshot_prefix}$(( elapsed_time + interval )).$(( interval ))"
     fi
   elif (( $# == 5 )); then
     if [[ -d "${snapshot_to_update}" ]]; then
-      # TO DO: call snapshot_dir_name:
       mv -- "${snapshot_to_update}" "${snapshot_prefix}$5.$(( interval ))"
     else
-      # TO DO: call snapshot_dir_name:
       mkdir "${snapshot_prefix}$5.$(( interval ))"
     fi
   else

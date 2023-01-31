@@ -37,3 +37,14 @@ Scenario: The user backs up after appending "hello" to limit+interval snapshot
     Then the command fails
     And a message is printed to standard error
     And the message contains the phrase "${TEMP_TEST_DIR}/hour.8.2_hello already exists"
+
+Scenario: The user appends "hello" to a snapshot and rotates snapshots
+    Given the directory "${TEMP_TEST_DIR}/hour.6.2 exists
+    And the directory "${TEMP_TEST_DIR}/minute.120.30" exists
+    When the user renames the directory "${TEMP_TEST_DIR}/hour.6.2" to "${TEMP_TEST_DIR}/hour.6.2_hello"
+    And executes "rback -r -- hour 2 2 6 minute 120 30 ${TEMP_TEST_DIR}"
+    Then the command succeeds
+    And the directory "${TEMP_TEST_DIR}/hour.6.2" exists
+    And the directory "${TEMP_TEST_DIR}/hour.2.2" exists
+    And the directory "${TEMP_TEST_DIR}/hour.6.2_hello" does not exist
+    And the directory "${TEMP_TEST_DIR}/hour.2.2_hello" does not exist
