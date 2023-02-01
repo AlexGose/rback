@@ -48,7 +48,13 @@ assert_inodes_not_equal() {
 }
 
 assert_current_timestamp() {
-  (( $(date +%s) - $(date -d "${output:0:19}" +%s) < 5 )) # within 5 second
+  local date_string
+  if (( $# == 0 )); then
+    date_string="${output:0:19}"
+  elif (( $# == 1)); then # input string format: "YYYYMMDD_HHMMSS"
+    date_string="${1:0:8} ${1:9:2}:${1:11:2}:${1:13:2}"
+  fi
+  (( $(date +%s) - $(date -d "${date_string}" +%s) < 5 )) # within 5 second
 }
 
 @test "script file exists" {
@@ -531,4 +537,13 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
   assert_dir_exists "${TEMP_TEST_DIR}/hour.2.2"
   assert_dir_not_exists "${TEMP_TEST_DIR}/hour.6.2_hello"
   assert_dir_not_exists "${TEMP_TEST_DIR}/hour.2.2_hello"
+}
+
+@test "the user backs up with \"-a\" when no snapshots exist" {
+  mkdir "${TEMP_TEST_DIR}/files"
+
+  run rback -a -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}"
+  assert_success
+  snapshot_dir="$(ls -d ${TEMP_TEST_DIR}/hour.4.4* | egrep 'hour.4.4_[[:digit:]]{8}_[[:digit:]]{6}')"
+  assert_current_timestamp "${snapshot_dir: -15}"
 }
