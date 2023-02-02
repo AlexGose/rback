@@ -24,3 +24,15 @@ Scenario: The user rotates snapshots with "-a" when no snapshots exist
     Then the command succeeds
     And the directory "${TEMP_TEST_DIR}/hour.4.4_YYYYMMDD_HHMMSS" exists
     And "YYYYMMDD" and "HHMMSS" is the current timestamp info within 5 seconds
+
+Scenario: The user backs up with "-a" and snapshots have timestamps
+    Given the snapshot folder "${TEMP_TEST_DIR}/hour.2.2" with timestamp appended exists
+    And the snapshot folder "${TEMP_TEST_DIR}/hour.4.2" with timestamp appended exists
+    And the snapshot folder "${TEMP_TEST_DIR}/hour.6.2" with timestamp appended exists
+    And the folder "${TEMP_TEST_DIR}/files" exists
+    When the user executes "rback -a -- hour 2 2 6 ${TEMP_TEST_DIR}/files/ ${TEMP_TEST_DIR}"
+    Then the command succeeds
+    And the directory "${TEMP_TEST_DIR}/hour.2.2_YYYYMMDD_HHMMSS" exists
+    And the directory "${TEMP_TEST_DIR}/hour.4.2_YYYYMMDD_HHMMSS" exists
+    And the directory "${TEMP_TEST_DIR}/hour.6.2_YYYYMMDD_HHMMSS" exists
+    And "YYYYMMDD" and "HHMMSS" is the current timestamp info within 5 seconds in each case

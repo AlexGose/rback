@@ -557,3 +557,23 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
   snapshot_dir="$(ls -d ${TEMP_TEST_DIR}/hour.4.4* | egrep 'hour.4.4_[[:digit:]]{8}_[[:digit:]]{6}')"
   assert_current_timestamp "${snapshot_dir: -15}"
 }
+
+@test "the user backs up with \"-a\" and snapshots have timestamps" {
+  mv -- "${TEMP_TEST_DIR}/hour.2.2" \
+      "${TEMP_TEST_DIR}/hour.2.2_$(date +'%Y%m%d')_$(date +'%H%M%S')"
+  mv -- "${TEMP_TEST_DIR}/hour.4.2" \
+      "${TEMP_TEST_DIR}/hour.4.2_$(date +'%Y%m%d')_$(date +'%H%M%S')"
+  mv -- "${TEMP_TEST_DIR}/hour.6.2" \
+      "${TEMP_TEST_DIR}/hour.6.2_$(date +'%Y%m%d')_$(date +'%H%M%S')"
+  mkdir "${TEMP_TEST_DIR}/files"
+
+  run rback -a -- hour 2 2 6 "${TEMP_TEST_DIR}/files/" "${TEMP_TEST_DIR}"
+
+  assert_success
+  snapshot_dir="$(ls -d ${TEMP_TEST_DIR}/hour.2.2* | egrep 'hour.2.2_[[:digit:]]{8}_[[:digit:]]{6}')"
+  assert_current_timestamp "${snapshot_dir: -15}"
+  snapshot_dir="$(ls -d ${TEMP_TEST_DIR}/hour.4.2* | egrep 'hour.4.2_[[:digit:]]{8}_[[:digit:]]{6}')"
+  assert_current_timestamp "${snapshot_dir: -15}"
+snapshot_dir="$(ls -d ${TEMP_TEST_DIR}/hour.6.2* | egrep 'hour.6.2_[[:digit:]]{8}_[[:digit:]]{6}')"
+  assert_current_timestamp "${snapshot_dir: -15}"
+}
