@@ -6,9 +6,11 @@
 $ src/rback -h
 
 Usage: rback -h
-       rback [ -v ] [ [ --delete-excluded ] --exclude-file <filename> ] \
+       rback [ -v ] [ -a ] \
+           [ [ --delete-excluded ] --exclude-file <filename> ] \
            -- UNIT START INTERVAL LIMIT SRC1 [ SRC2 [ ... ] ] DEST
-       rback -r [ -v ] [ [ --delete-excluded ] --exclude-file <filename> ] \
+       rback -r [ -v ] [ -a ] \
+           [ [ --delete-excluded ] --exclude-file <filename> ] \
            -- UNIT1 START1 INTERVAL1 LIMIT1 UNIT2 START2 INTERVAL2 DEST
   OPTIONS
     -h, --help            Display this help message
@@ -16,6 +18,7 @@ Usage: rback -h
     -v, --verbose         Enable logging.  Verbose output with timestamps
     -x, --exclude-file    Flag for exclusion file passed to Rsync
     -d, --delete-excluded Flag for deleting excluded backup files and folders
+    -a, --add-timestamps  Flag to append timestamps to snapshot folder names
   ARGS
     UNIT                  Unit of time (minute, hour, day, week, month, etc.)
     START                 Integer elapsed start time, time for first snapshot

@@ -26,9 +26,11 @@ usage() {
   fi
   local usage_string
   usage_string="Usage: rback -h
-       rback [ -v ] [ [ --delete-excluded ] --exclude-file <filename> ] \\
+       rback [ -v ] [ -a ] \\
+           [ [ --delete-excluded ] --exclude-file <filename> ] \\
            -- UNIT START INTERVAL LIMIT SRC1 [ SRC2 [ ... ] ] DEST
-       rback -r [ -v ] [ [ --delete-excluded ] --exclude-file <filename> ] \\
+       rback -r [ -v ] [ -a ] \\
+           [ [ --delete-excluded ] --exclude-file <filename> ] \\
            -- UNIT1 START1 INTERVAL1 LIMIT1 UNIT2 START2 INTERVAL2 DEST
   OPTIONS
     -h, --help            Display this help message
@@ -36,6 +38,7 @@ usage() {
     -v, --verbose         Enable logging.  Verbose output with timestamps
     -x, --exclude-file    Flag for exclusion file passed to Rsync
     -d, --delete-excluded Flag for deleting excluded backup files and folders
+    -a, --add-timestamps  Flag to append timestamps to snapshot folder names
   ARGS
     UNIT                  Unit of time (minute, hour, day, week, month, etc.)
     START                 Integer elapsed start time, time for first snapshot
@@ -58,14 +61,17 @@ usage() {
 # an empty snapshot folder corresponding to <start> <time unit>s will be
 # created.
 #
-# Usage: rotate <backup dir> <time unit> <start> <interval> <limit> [<verbose>]
+# Usage: rotate <backup dir> <time unit> <start> <interval> <limit> <verbose> \
+#                 <timestamp>
 #
 # Inputs: <backup dir> - path to the directory containing all snapshot folders
 #         <time unit> - unit of time ("minute","hour","day",etc.)
 #         <start> - integer elapsed start time, time of the first snapshot
 #         <interval> - integer interval of elapsed time, time between snapshots
 #         <limit> - integer limit of elapsed time, time limit of snapshots
-#         <verbose> - (optional) if "true", then print verbose output
+#         <verbose> - if "true", then print verbose output
+#         <timestamp> - if "true", then append timestamp info to every snapshot
+#                 folder name
 #
 # In the backup directory, a snapshot folder for <limit> + <interval> elapsed
 # time will be created temporarily if it does not already exist; otherwise,
@@ -84,6 +90,8 @@ rotate() {
   limit=$5
   local verbose
   verbose=$6
+  local timestamp
+  timestamp=$7
 
   local temp_folder # temporary snapshot folder name
   temp_folder="$(snapshot_dir_name "${backup_dir}" "${time_unit}" \
@@ -95,10 +103,10 @@ rotate() {
   fi
 
   for (( n = limit; n >= start; n -= interval )); do
-    update "${backup_dir}" "${time_unit}" $n "${interval}"
+    update "${backup_dir}" "${time_unit}" $n "${interval}" "" "${timestamp}"
   done
   update "${backup_dir}" "${time_unit}" "$(( limit + interval ))" \
-        "${interval}" "${start}"
+        "${interval}" "${start}" "${timestamp}"
 }
 
 # Update a snapshot folder to the next interval of, or given, elapsed time
@@ -112,42 +120,48 @@ rotate() {
 #    <time before> - integer elapsed time for the snapshot before update
 #    <interval> - integer interval of elapsed time, for the snapshot before
 #                 update
-#    <time after> - (optional) integer elapsed time, for the snapshot after
-#                 update.  An empty argument implies that the snapshot
+#    <time after> - integer elapsed time, for the snapshot after
+#                 update.  An empty string argument implies that the snapshot
 #                 will have a total elapsed time of <time before> + <interval>
 #                 after update 
+#    <timestamp> - if "true", then append timestamp info to the end of the
+#                 updated snapshot folder name
 #
 #  This function changes the name of the snapshot folder corresponding to the
-#  input arguments, if such a snapshot exits.  Otherwise, in the case of 4 
-#  input arguments, nothing will be done.  In the case of 5 input arguments,
+#  input arguments, if such a snapshot exits.  Otherwise, in the case of
+#  an empty string for the 5th argument, nothing will be done.
+#  In the case of a non-empty 5th input argument,
 #  the function will create an empty snapshot folder corresponding to the
-#  elapsed time after the update.  An error will occur if the
-#  number of arguments to this function is incorrect.
+#  elapsed time after the update.
 update() {
-  local snapshot_prefix
-  snapshot_prefix="$1/$2."
+  local updated_snapshot
+  updated_snapshot="$1/$2."
   local elapsed_time
   elapsed_time=$3
   local interval
   interval=$4
   local snapshot_to_update
   snapshot_to_update="$(snapshot_dir_name "$1" "$2" "$3" "$4")"
+  local timestamp_info
 
-  if (( $# == 4 )); then
+  if [[ "$6" == "true" ]]; then
+    timestamp_info="_$(date +'%Y%m%d_%H%M%S')"
+  else
+    timestamp_info=""
+  fi
+
+  if [[ -z "$5" ]]; then
     if [[ -d "${snapshot_to_update}" ]]; then
-      mv -- "${snapshot_to_update}" \
-          "${snapshot_prefix}$(( elapsed_time + interval )).$(( interval ))"
-    fi
-  elif (( $# == 5 )); then
-    if [[ -d "${snapshot_to_update}" ]]; then
-      mv -- "${snapshot_to_update}" "${snapshot_prefix}$5.$(( interval ))"
-    else
-      mkdir "${snapshot_prefix}$5.$(( interval ))"
+      updated_snapshot+="$(( elapsed_time + interval )).$(( interval ))"
+      mv -- "${snapshot_to_update}" "${updated_snapshot}${timestamp_info}"
     fi
   else
-    local error_prefix
-    error_prefix="${FUNCNAME[0]}: ${LINENO[0]}:"
-    error "${error_prefix} $# arguments were passed, but expected 4 or 5."
+    updated_snapshot+="$5.$(( interval ))"
+    if [[ -d "${snapshot_to_update}" ]]; then
+      mv -- "${snapshot_to_update}" "${updated_snapshot}${timestamp_info}"
+    else
+      mkdir "${updated_snapshot}${timestamp_info}"
+    fi
   fi
 }
 
@@ -216,6 +230,8 @@ main() {
   unknown_option=""
   local error_prefix
   error_prefix=""
+  local add_timestamp
+  add_timestamp="false"
 
   while :; do
     case "$1" in
@@ -224,6 +240,7 @@ main() {
       -x|--exclude-file|--exclude-from) exclude_file="$2"; shift ;;
       -d|--delete-excluded) delete_excluded="true" ;;
       -v|--verbose) verbose="true" ;;
+      -a|--add-timestamps) add_timestamp="true" ;;
       --) shift; break ;;
       -*) unknown_option="$1" ;;
       *) break ;;
@@ -308,7 +325,7 @@ main() {
   fi
 
   rotate "${backup_dir}" "${time_unit}" "${start}" "${interval}" "${limit}" \
-      "${verbose}"
+      "${verbose}" "${add_timestamp}"
   target_dir="$(snapshot_dir_name "${backup_dir}" "${time_unit}" \
       "$(( start ))" "${interval}" "${verbose}")"
 
