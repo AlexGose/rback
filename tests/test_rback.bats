@@ -591,3 +591,12 @@ snapshot_dir="$(ls -d ${TEMP_TEST_DIR}/hour.6.2* | egrep 'hour.6.2_[[:digit:]]{8
 snapshot_dir="$(ls -d ${TEMP_TEST_DIR}/hour.6.2* | egrep 'hour.6.2_[[:digit:]]{8}_[[:digit:]]{6}')"
   assert_current_timestamp "${snapshot_dir: -15}"
 }
+
+
+@test "the user looks up the command line option for adding timestamps" {
+  run rback -h
+
+  assert_output --regexp "rback .*\[ -a \]"
+  assert_output --regexp "rback -r .*\[ -a \]"
+  assert_output --partial "-a, --add-timestamps"
+}

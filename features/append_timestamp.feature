@@ -48,3 +48,9 @@ Scenario: The user rotates snapshots with "-a" without appended timestamps
     And the directory "${TEMP_TEST_DIR}/hour.4.2_YYYYMMDD_HHMMSS" exists
     And the directory "${TEMP_TEST_DIR}/hour.6.2_YYYYMMDD_HHMMSS" exists
     And "YYYYMMDD" and "HHMMSS" is the current timestamp info within 5 seconds in each case
+
+Scenario: The user looks up the command line option for adding timestamps
+    When the user enters "rback -h"
+    Then "[ -a ]" is shown in the usage information for "rback"
+    And "[ -a ]" is shown in the usage information for "rback -r"
+    And the options "-a, --add-timestamps" appear as well
