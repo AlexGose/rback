@@ -547,3 +547,13 @@ run rback --delete-excluded -- hour 4 4 12 "${TEMP_TEST_DIR}/files/" "${TEMP_TES
   snapshot_dir="$(ls -d ${TEMP_TEST_DIR}/hour.4.4* | egrep 'hour.4.4_[[:digit:]]{8}_[[:digit:]]{6}')"
   assert_current_timestamp "${snapshot_dir: -15}"
 }
+
+@test "the user rotates snapshots with \"-a\" when no snapshots exist" {
+  mkdir "${TEMP_TEST_DIR}/minute.240.30"
+
+  run rback -r -a -- hour 4 4 12 minute 240 30 "${TEMP_TEST_DIR}"
+
+  assert_success
+  snapshot_dir="$(ls -d ${TEMP_TEST_DIR}/hour.4.4* | egrep 'hour.4.4_[[:digit:]]{8}_[[:digit:]]{6}')"
+  assert_current_timestamp "${snapshot_dir: -15}"
+}
