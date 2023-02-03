@@ -103,10 +103,11 @@ rotate() {
   fi
 
   for (( n = limit; n >= start; n -= interval )); do
-    update "${backup_dir}" "${time_unit}" $n "${interval}" "" "${timestamp}"
+    update "${backup_dir}" "${time_unit}" $n "${interval}" "" "${timestamp}" \
+        "${verbose}"
   done
   update "${backup_dir}" "${time_unit}" "$(( limit + interval ))" \
-        "${interval}" "${start}" "${timestamp}"
+        "${interval}" "${start}" "${timestamp}" "${verbose}"
 }
 
 # Update a snapshot folder to the next interval of, or given, elapsed time
@@ -126,6 +127,7 @@ rotate() {
 #                 after update 
 #    <timestamp> - if "true", then append timestamp info to the end of the
 #                 updated snapshot folder name
+#    <verbose> - if "true", then print verbose output
 #
 #  This function changes the name of the snapshot folder corresponding to the
 #  input arguments, if such a snapshot exits.  Otherwise, in the case of
@@ -141,7 +143,7 @@ update() {
   local interval
   interval=$4
   local snapshot_to_update
-  snapshot_to_update="$(snapshot_dir_name "$1" "$2" "$3" "$4")"
+  snapshot_to_update="$(snapshot_dir_name "$1" "$2" "$3" "$4" "$7")"
   local timestamp_info
 
   if [[ "$6" == "true" ]]; then
@@ -175,7 +177,7 @@ update() {
 #    <time unit> - unit of time ("minute","hour","day",etc.)
 #    <elapsed time> - integer elapsed time for the snapshot
 #    <interval> - integer interval of elapsed time
-#    <verbose> - (optional) if "true", then print verbose output for errors
+#    <verbose> - if "true", then print verbose output for errors
 #
 # This function prints the unique name of the snapshot folder made after
 # <elapsed time> <time unit>s of time with the snapshot made every <interval>

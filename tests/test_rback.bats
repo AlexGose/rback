@@ -600,3 +600,16 @@ snapshot_dir="$(ls -d ${TEMP_TEST_DIR}/hour.6.2* | egrep 'hour.6.2_[[:digit:]]{8
   assert_output --regexp "rback -r .*\[ -a \]"
   assert_output --partial "-a, --add-timestamps"
 }
+
+@test "the user copies last snapshot, appends \"hello\", and rotates snapshots" {
+  mkdir "${TEMP_TEST_DIR}/minute.120.30"
+  
+  cp -r "${TEMP_TEST_DIR}/hour.6.2" "${TEMP_TEST_DIR}/hour.6.2_hello"
+  run rback --rotate -v -- hour 2 2 6 minute 120 30 "${TEMP_TEST_DIR}"
+
+  assert_failure
+  assert_output --partial "conflicting snapshot names"
+  assert_output --partial "${TEMP_TEST_DIR}/hour.6.2"
+  assert_output --partial "${TEMP_TEST_DIR}/hour.6.2_hello"
+  assert_current_timestamp
+}
