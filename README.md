@@ -14,9 +14,13 @@ Rback has a number of other benefits.  Detailed metadata, including elapsed time
 
 ## Rsync-based Bash Backup Scripts
 
-Over the past 20 years, many people have written backup programs using Rsync.  The [mikerubel.org](http://www.mikerubel.org/computers/rsync_snapshots/) website lists several in the "Contributed Codes" section.  The website also includes Bash code with detailed commentary.  This is a particularly useful resource if you want to write your own backup program, which is a great way to learn about Unix-based filesystems, hard links, Bash, and Rsync.
+Over the past 20 years, many people have written backup programs using Rsync.  The [mikerubel.org](http://www.mikerubel.org/computers/rsync_snapshots/) website lists several in the "Contributed Codes" section.  The website also includes Bash code with detailed commentary.  This is a particularly useful resource if you want to write your own backup program, which is a great way to learn about [Unix-based filesystems](https://en.wikipedia.org/wiki/Unix_filesystem), [hard links](https://en.wikipedia.org/wiki/Hard_link), Bash, and Rsync.
 
-Rsync-based Bash backup scripts continue to be widely used today.  Some are recently developed and very popular, like [rsync-time-backup](https://github.com/laurent22/rsync-time-backup).
+Rsync-based Bash backup scripts continue to be widely used today.  Some are recently developed and very popular, like [rsync-time-backup](https://github.com/laurent22/rsync-time-backup).  These scripts tend to be simple, usually only several hundred lines of code, making the source code easier to read and modify.
+
+Since Bash and Rsync are often available by default on Linux systems, these scripts can be used across many [distributions](https://en.wikipedia.org/wiki/Linux_distribution) without installing additional software.  Rsync provides fast back ups, including those to or from remote machines.
+
+Snapshots based on hard links give the illusion of complete copies of all files for each snapshot, without taking up as much space as full copies.  This allows you to navigate backed up files using the familiar `cd` command or your preferred file manager program, such as [nautilus](https://gitlab.gnome.org/GNOME/nautilus). Opening and viewing files on the backup drive can be done in the same way as you would have on your machine's hard drive just before the backup snapshot was made.
 
 ## Usage
 

@@ -27,3 +27,11 @@ Scenario: The user reads a brief explanation of what Rsync based Bash backups ar
     And links to several scripts are provided
     And the continued use and value of such scripts is mentioned
     And an example of a recently developed and popular script is provided
+
+Scenario: The user reads a brief explanation of the features of Rsync based Bash backups
+    When the user scrolls down the README file
+    And the simplicity of these scripts is mentioned
+    And the portability of Bash is mentioned
+    And the speed benefit of Rsync, including to/from remote machines, is mentioned 
+    And the familiarity and space savings of hard links is mentioned
+    And every feature mentioned has benefits describing its value
