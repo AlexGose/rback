@@ -12,6 +12,12 @@ A practical solution to this problem is to backup files every five minutes but o
 
 Rback has a number of other benefits.  Detailed metadata, including elapsed time, update intervals, and timestamps for each snapshot, can be stored in each snapshot folder name.  This avoids the need for metadata files, which can be corrupted or lost.  Rback has an extensive set of [bats-core](https://github.com/bats-core/bats-core) tests and [Gherkin](https://cucumber.io/docs/gherkin/reference/) feature files.  The project also strives to conform to the [Google Shell Style Guide](https://google.github.io/styleguide/shellguide.html).  This makes the project source code easier to read, modify, and maintain.
 
+## Rsync-based Bash Backup Scripts
+
+Over the past 20 years, many people have written backup programs using Rsync.  The [mikerubel.org](http://www.mikerubel.org/computers/rsync_snapshots/) website lists several in the "Contributed Codes" section.  The website also includes Bash code with detailed commentary.  This is a particularly useful resource if you want to write your own backup program, which is a great way to learn about Unix-based filesystems, hard links, Bash, and Rsync.
+
+Rsync-based Bash backup scripts continue to be widely used today.  Some are recently developed and very popular, like [rsync-time-backup](https://github.com/laurent22/rsync-time-backup).
+
 ## Usage
 
 ```console

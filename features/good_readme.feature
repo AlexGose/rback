@@ -19,3 +19,11 @@ Scenario: The user reads a brief explanation of the unique value proposition
     And striving to conform to the Google Shell Style Guide (GSSG) is mentioned as a feature
     And every feature mentioned has a benefit describing its value
     And there are hyperlinks for Rsync, Ubuntu 20.04, bats-core, Gherkin, and the GSSG
+
+Scenario: The user reads a brief explanation of what Rsync based Bash backups are
+    When the user scrolls down the README file
+    Then there is a brief section titled "Rsync-based Bash backup scripts"
+    And the long history of such scripts is mentioned
+    And links to several scripts are provided
+    And the continued use and value of such scripts is mentioned
+    And an example of a recently developed and popular script is provided
