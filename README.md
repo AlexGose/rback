@@ -8,9 +8,20 @@ One of the distinguishing features of Rback is greater control over the structur
 
 Consider the following problem.  You have files on your computer's hard drive that need to be backed up regularly in case the hard drive fails.  You would also like to have frequent backups made in case you accidentally delete or modify a file.  So, you decide to have backups made every five minutes to avoid losing too much data when you accidentally delete a file.  Unfortunately, frequent backups like this would quickly use up all the space on your backup hard drive.
 
-A practical solution to this problem is to backup files every five minutes but only keep the most recent past hour of those backups.  You may also want backups every 20 minutes for the most recent past 5 hours and backups every hour between the past 4th and 24th hours.  This is in addition to daily, weekly, and monthly backups that are stored over intervals of time with varying degrees of overlap.  Most Bash backup scripts cannot easily accommodate this type of custom backup scheme, but Rback is specifically designed for it.
+A practical solution to this problem is to backup files every five minutes but only keep the most recent past hour of those backups.  You may also want backups every 20 minutes for the most recent past 5 hours and backups every hour between the past 4th and 24th hours.  This is in addition to daily, weekly, and monthly backups that are stored over intervals of time with varying degrees of overlap.  Most Bash backup scripts cannot easily accommodate this type of custom backup scheme, but Rback is designed for it.
 
-Rback has a number of other benefits.  Detailed metadata, including elapsed time, update intervals, and timestamps for each snapshot, can be stored in each snapshot folder name.  This avoids the need for metadata files, which can be corrupted or lost.  Rback has an extensive set of [bats-core](https://github.com/bats-core/bats-core) tests and [Gherkin](https://cucumber.io/docs/gherkin/reference/) feature files.  The project also strives to conform to the [Google Shell Style Guide](https://google.github.io/styleguide/shellguide.html).  This makes the project source code easier to read, modify, and maintain.
+## Features and Benefits
+
+- No metadata files
+- Supports complex snapshot folder structure
+- Extensive bats-core tests
+- Gherkin feature files
+- Rsync-based for speed
+- [Hard links](https://en.wikipedia.org/wiki/Free_and_open-source_software) for space savings
+- Strives for Google Shell Style Guide conformance
+- [Free and open source](https://en.wikipedia.org/wiki/Free_and_open-source_software)
+
+Rback has a number of benefits.  Detailed metadata, including elapsed time, update intervals, and timestamps for each snapshot, can be stored in each snapshot folder name.  This avoids the need for metadata files, which can be corrupted or lost.  Rback has an extensive set of [bats-core](https://github.com/bats-core/bats-core) tests and [Gherkin](https://cucumber.io/docs/gherkin/reference/) feature files.  The project also strives to conform to the [Google Shell Style Guide](https://google.github.io/styleguide/shellguide.html).  This makes the project source code easier to read, modify, and maintain.
 
 ## Rsync-based Bash Backup Scripts
 

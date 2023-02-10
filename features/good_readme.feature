@@ -35,3 +35,9 @@ Scenario: The user reads a brief explanation of the features of Rsync based Bash
     And the speed benefit of Rsync, including to/from remote machines, is mentioned 
     And the familiarity and space savings of hard links is mentioned
     And every feature mentioned has benefits describing its value
+
+Scenario: The user reads a list of features
+    When the user scrolls down the README file
+    Then there is a bulleted list of features
+    And the list includes "free and open source" with a link
+    And the list includes other features mentioned in the README
