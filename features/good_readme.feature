@@ -41,3 +41,9 @@ Scenario: The user reads a list of features
     Then there is a bulleted list of features
     And the list includes "free and open source" with a link
     And the list includes other features mentioned in the README
+
+Scenario: The user reads a brief installation guide for Ubuntu 20.04
+    When the user scrolls down the README file
+    Then there is a section titled "Installation"
+    And simply downloading "src/rback" is mentioned
+    And cloning the repo is mentioned if the user wants to run the tests
