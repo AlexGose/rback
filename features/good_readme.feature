@@ -47,3 +47,8 @@ Scenario: The user reads a brief installation guide for Ubuntu 20.04
     Then there is a section titled "Installation"
     And simply downloading "src/rback" is mentioned
     And cloning the repo is mentioned if the user wants to run the tests
+
+Scenario: The user reads a brief guide for running tests in Docker
+    When the user scrolls down the README file
+    Then there is mention of how to build the rbacktest Docker image
+    And there is mention of how to run the tests in a Docker container
