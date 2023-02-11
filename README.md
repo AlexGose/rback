@@ -117,3 +117,15 @@ Rsync-based Bash backup scripts continue to be widely used today.  Some are rece
 Since Bash and Rsync are often available by default on Linux systems, these scripts can be used across many [distributions](https://en.wikipedia.org/wiki/Linux_distribution) without installing additional software.  Rsync provides fast back ups, including those to or from remote machines.
 
 Snapshots based on hard links give the illusion of complete copies of all files for each snapshot, without taking up as much space as full copies.  This allows you to navigate backed up files using the familiar `cd` command or your preferred file manager program, such as [nautilus](https://gitlab.gnome.org/GNOME/nautilus). Opening and viewing files on the backup drive can be done in the same way as you would have on your machine's hard drive just before the backup snapshot was made.
+
+## Acknowledgments
+
+Thank you to the people who contributed to the projects mentioned here.
+
+## Author
+
+Alexander H Gose
+
+## License
+
+[MIT License](LICENSE)

@@ -58,3 +58,10 @@ Scenario: The user reads how to run the script as a Cron job
     Then there is a section titled "Getting Started"
     And instructions for opening the crontab file are given
     And instructions for adding the Cron job are given
+
+Scenario: The user reads acknowledgements, author list, and license
+    When the user scrolls down the README file
+    Then there are sections "Acknowledgements", "Author", and "License"
+    And all the projects mentioned in the README are acknowledged
+    And the author is mentioned in the Author section
+    And the license is mentioned in the License section
