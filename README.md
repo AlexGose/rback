@@ -2,7 +2,7 @@
 
 ##  Introduction
 
-Rback is a [Bash](https://www.gnu.org/software/bash/) wrapper script for [Rsync](https://rsync.samba.org/) backups on [Ubuntu 20.04](https://releases.ubuntu.com/focal/) Linux.  Although there are numerous Rsync-based Bash backup scripts, Rback's collection of features is unique as far as the author can tell (please open an [issue](https://github.com/AlexGose/rback/issues) if you feel otherwise).
+Rback is a [Bash](https://www.gnu.org/software/bash/) wrapper script for [Rsync](https://rsync.samba.org/) backups on [Ubuntu 20.04](https://releases.ubuntu.com/focal/) Linux.  Although there are numerous Rsync-based Bash backup scripts, Rback's collection of features is unique as far as the author can tell (please open an [issue](https://github.com/AlexGose/rback/issues) if you feel otherwise). See the [Rsync-based Bash Backup Scripts](#rsync-based-bash-backup-scripts) section below for more background information.
 
 One of the distinguishing features of Rback is greater control over the structure of your backup snapshot folders, saving space while giving you quick access to past versions of your files at varying intervals of time that you specify.
 
@@ -38,15 +38,33 @@ Make the script file executable:
 chmod a+x src/rback
 ```
 
-## Rsync-based Bash Backup Scripts
+## Getting Started
 
-Over the past 20 years, many people have written backup programs using Rsync.  The [mikerubel.org](http://www.mikerubel.org/computers/rsync_snapshots/) website lists several in the "Contributed Codes" section.  The website also includes Bash code with detailed commentary.  This is a particularly useful resource if you want to write your own backup program, which is a great way to learn about [Unix-based filesystems](https://en.wikipedia.org/wiki/Unix_filesystem), [hard links](https://en.wikipedia.org/wiki/Hard_link), Bash, and Rsync.
+To automate rotation and backups, set up a [Cron](https://en.wikipedia.org/wiki/Cron) job:
 
-Rsync-based Bash backup scripts continue to be widely used today.  Some are recently developed and very popular, like [rsync-time-backup](https://github.com/laurent22/rsync-time-backup).  These scripts tend to be simple, usually only several hundred lines of code, making the source code easier to read and modify.
+```
+crontab -e
+```
 
-Since Bash and Rsync are often available by default on Linux systems, these scripts can be used across many [distributions](https://en.wikipedia.org/wiki/Linux_distribution) without installing additional software.  Rsync provides fast back ups, including those to or from remote machines.
+Add the following line to the end of the file to make backup snapshots every five minutes that will be kept for the most recent past hour:
 
-Snapshots based on hard links give the illusion of complete copies of all files for each snapshot, without taking up as much space as full copies.  This allows you to navigate backed up files using the familiar `cd` command or your preferred file manager program, such as [nautilus](https://gitlab.gnome.org/GNOME/nautilus). Opening and viewing files on the backup drive can be done in the same way as you would have on your machine's hard drive just before the backup snapshot was made.
+```
+*/5   *   *   *   *   /path/to/rback -- minute 5 5 60 /path/to/your/files /path/to/backup/folder
+```
+
+To keep snapshots every 20 minutes for the most recent 5 hours, also add this line to the end of the file:
+
+```
+*/20   *   *   *   *  /path/to/rback -r -- minute 20 20 300 minute 20 5 /path/to/backup/folder
+```
+
+To keep snapshots every hour between the past 4th and 24th hours, also add this line to the end of the file:
+
+```
+0   *   *   *   *   /path/to/rback -r -- hour 4 1 24 minute 240 20 /path/to/backup/folder
+```
+
+Save and close the file.
 
 ## Usage
 
@@ -89,3 +107,13 @@ Run the tests in the container:
 ```
 docker run -it --rm -v "${PWD}:/code" --name rbacktest rbacktest
 ```
+
+## Rsync-based Bash Backup Scripts
+
+Over the past 20 years, many people have written backup programs using Rsync.  The [mikerubel.org](http://www.mikerubel.org/computers/rsync_snapshots/) website lists several in the "Contributed Codes" section.  The website also includes Bash code with detailed commentary.  This is a particularly useful resource if you want to write your own backup program, which is a great way to learn about [Unix-based filesystems](https://en.wikipedia.org/wiki/Unix_filesystem), [hard links](https://en.wikipedia.org/wiki/Hard_link), Bash, and Rsync.
+
+Rsync-based Bash backup scripts continue to be widely used today.  Some are recently developed and very popular, like [rsync-time-backup](https://github.com/laurent22/rsync-time-backup).  These scripts tend to be simple, usually only several hundred lines of code, making the source code easier to read and modify.
+
+Since Bash and Rsync are often available by default on Linux systems, these scripts can be used across many [distributions](https://en.wikipedia.org/wiki/Linux_distribution) without installing additional software.  Rsync provides fast back ups, including those to or from remote machines.
+
+Snapshots based on hard links give the illusion of complete copies of all files for each snapshot, without taking up as much space as full copies.  This allows you to navigate backed up files using the familiar `cd` command or your preferred file manager program, such as [nautilus](https://gitlab.gnome.org/GNOME/nautilus). Opening and viewing files on the backup drive can be done in the same way as you would have on your machine's hard drive just before the backup snapshot was made.

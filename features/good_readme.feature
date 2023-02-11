@@ -52,3 +52,9 @@ Scenario: The user reads a brief guide for running tests in Docker
     When the user scrolls down the README file
     Then there is mention of how to build the rbacktest Docker image
     And there is mention of how to run the tests in a Docker container
+
+Scenario: The user reads how to run the script as a Cron job
+    When the user scrolls down the README file
+    Then there is a section titled "Getting Started"
+    And instructions for opening the crontab file are given
+    And instructions for adding the Cron job are given
